@@ -29,6 +29,7 @@ namespace Core.Room
         public Tilemap decorTilemap;
 
         [Header("Highlights")] public Tilemap highlightTilemap;
+        public Tilemap previewTilemap;
         public Tilemap effectHighlightTilemap;
 
         [Header("Spawn")] public Transform playerSpawnPoint;
@@ -81,6 +82,9 @@ namespace Core.Room
 
             if (highlightTilemap == null)
                 highlightTilemap = transform.Find("Grid/Highlight_Tilemap")?.GetComponent<Tilemap>();
+            
+            if (previewTilemap == null)
+                previewTilemap = transform.Find("Grid/Preview_Tilemap")?.GetComponent<Tilemap>();
 
             if (effectHighlightTilemap == null)
                 effectHighlightTilemap = transform.Find("Grid/EffectHighlightTilemap")?.GetComponent<Tilemap>();
@@ -113,7 +117,7 @@ namespace Core.Room
             );
 
             // Настройка подсветки
-            GridHighlighter.Instance?.UpdateTilemaps(highlightTilemap, effectHighlightTilemap);
+            GridHighlighter.Instance?.UpdateTilemaps(highlightTilemap, previewTilemap, effectHighlightTilemap);
 
             // Инициализация врагов
             foreach (var enemy in enemiesInRoom)

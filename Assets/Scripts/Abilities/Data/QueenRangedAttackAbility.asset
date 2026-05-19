@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49ffc3c9ea384350a86128946bfc3658, type: 3}
+  m_Name: QueenRangedAttackAbility
+  m_EditorClassIdentifier: GameScripts::Abilities.QueenRangedAttackAbilityData
+  abilityName: "\u0414\u0430\u043B\u044C\u043D\u044F\u044F \u0444\u0435\u0440\u0437\u0435\u043C"
+  energyCost: 0
+  bonusDamage: 0
+  overrideBaseDamage: 0
+  highlightColor: {r: 1, g: 1, b: 1, a: 1}
+  effectColor: {r: 1, g: 0.2, b: 0.2, a: 1}
+  minRange: 2
+  maxRange: 3
+  maxDiagonalRange: 2
+  projectilePrefab: {fileID: 2925020745135665912, guid: e945ce1183cf6ae4f9109d6da1d9f38f, type: 3}
+  chargeEffectPrefab: {fileID: 4494311070640868934, guid: 1ddf84f6e6fcb464f99ce0afd16e5ab0, type: 3}
+  chargeTime: 0.3

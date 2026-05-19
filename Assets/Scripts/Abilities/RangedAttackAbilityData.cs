@@ -62,6 +62,25 @@ namespace Abilities
             var target = GridManager.Instance.GetEntityAt(targetCell);
             return target != null;
         }
+        
+        public override List<Vector3Int> GetTheoreticalCellsFrom(Vector3Int origin, BaseEntity actor)
+        {
+            var result = new List<Vector3Int>();
+
+            for (var dx = -maxRange; dx <= maxRange; dx++)
+            for (var dy = -maxRange; dy <= maxRange; dy++)
+            {
+                var manh = Mathf.Abs(dx) + Mathf.Abs(dy);
+                if (manh < minRange || manh > maxRange) continue;
+
+                var cell = new Vector3Int(origin.x + dx, origin.y + dy, origin.z);
+                if (!GridManager.Instance.HasFloor(cell)) continue;
+
+                result.Add(cell);
+            }
+
+            return result;
+        }
 
         public override IEnumerator Execute(BaseEntity actor, Vector3Int targetCell)
         {

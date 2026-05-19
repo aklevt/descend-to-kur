@@ -96,5 +96,34 @@ namespace Abilities
                 }
             }
         }
+        
+        public override List<Vector3Int> GetTheoreticalCellsFrom(Vector3Int position, BaseEntity actor)
+        {
+            int maxRange;
+
+            if (actor is PlayerMovement player)
+                maxRange = player.Stats.MaxStepsPerRound;
+            else if (actor is EnemyBase)
+                maxRange = actor.Stats.MoveRange;
+            else
+                maxRange = 0;
+
+            if (maxRange <= 0) return new List<Vector3Int>();
+
+            var cells = new List<Vector3Int>();
+            for (var dx = -maxRange; dx <= maxRange; dx++)
+            for (var dy = -maxRange; dy <= maxRange; dy++)
+            {
+                var manh = Mathf.Abs(dx) + Mathf.Abs(dy);
+                if (manh == 0 || manh > maxRange) continue;
+
+                var cell = new Vector3Int(position.x + dx, position.y + dy, position.z);
+                if (!GridManager.Instance.HasFloor(cell)) 
+                    continue;
+
+                cells.Add(cell);
+            }
+            return cells;
+        }
     }
 }

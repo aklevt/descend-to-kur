@@ -8,7 +8,13 @@ namespace Core
     {
         private Camera mainCamera;
         private Vector3Int lastHoveredCell;
+        private bool lastAltState;
 
+        private const float PreviewHoverDelay = 0.3f;
+        private Vector3Int previewHoverCell;
+        private float previewHoverTimer;
+        private bool previewShown;
+        
         private void Awake()
         {
             mainCamera = Camera.main;
@@ -152,6 +158,8 @@ namespace Core
             }
             
             HandleCellHover();
+            HandleAltToggle();
+            UpdateEnemyPreview();
         }
 
         private void HandleMouseClick()
@@ -177,6 +185,78 @@ namespace Core
                 AbilityController.Instance.HandleCellHover(hoveredCell);
             }
         }
+        
+        /// <summary>
+        /// При нажатии/отпускании Alt обновляет превью
+        /// </summary>
+        private void HandleAltToggle()
+        {
+            var kb = Keyboard.current;
+            if (kb == null) return;
+
+            var altHeld = kb.leftAltKey.isPressed || kb.rightAltKey.isPressed;
+
+            if (altHeld != lastAltState)
+            {
+                lastAltState = altHeld;
+                EnemyPreviewSystem.Instance?.RefreshPreview(altHeld);
+            }
+        }
+        
+        /// <summary>
+        /// Показ превью врага с задержкой
+        /// </summary>
+        private void UpdateEnemyPreview()
+        {
+            if (Mouse.current == null) return;
+
+            var mousePos = Mouse.current.position.ReadValue();
+            var worldPoint = mainCamera.ScreenToWorldPoint(
+                new Vector3(mousePos.x, mousePos.y, -mainCamera.transform.position.z));
+            var hoveredCell = GridManager.Instance.WorldToCell(worldPoint);
+
+            var altHeld = Keyboard.current?.leftAltKey.isPressed == true
+                          || Keyboard.current?.rightAltKey.isPressed == true;
+
+            if (hoveredCell != previewHoverCell)
+            {
+                previewHoverCell = hoveredCell;
+                previewHoverTimer = 0f;
+
+                if (previewShown)
+                {
+                    EnemyPreviewSystem.Instance?.HidePreview();
+                    previewShown = false;
+                }
+                return;
+            }
+
+            if (previewShown)
+            {
+                var stillShown = EnemyPreviewSystem.Instance?.TryShowPreview(hoveredCell, altHeld) ?? false;
+                if (!stillShown)
+                {
+                    EnemyPreviewSystem.Instance?.HidePreview();
+                    previewShown = false;
+                }
+                return;
+            }
+
+            previewHoverTimer += Time.unscaledDeltaTime;
+            if (previewHoverTimer < PreviewHoverDelay) return;
+
+            var shown = EnemyPreviewSystem.Instance?.TryShowPreview(hoveredCell, altHeld) ?? false;
+            previewShown = shown;
+
+            if (!shown)
+            {
+                previewHoverTimer = 0f;
+            }
+        }
+
+        /// <summary>
+        /// Показывает превью зоны врага при наведении
+        /// </summary>
         
         private Vector2 GetCameraMovementInput()
         {

@@ -59,6 +59,7 @@ MonoBehaviour:
   objectsTilemap: {fileID: 0}
   decorTilemap: {fileID: 0}
   highlightTilemap: {fileID: 0}
+  previewTilemap: {fileID: 0}
   effectHighlightTilemap: {fileID: 0}
   playerSpawnPoint: {fileID: 7901744147490316323}
   objectiveType: 0
@@ -180,7 +181,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 1691466705
-  m_SortingLayer: -2
+  m_SortingLayer: -3
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
@@ -5247,7 +5248,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: -917315931
-  m_SortingLayer: -3
+  m_SortingLayer: -4
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}

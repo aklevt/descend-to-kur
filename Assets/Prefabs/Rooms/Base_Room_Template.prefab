@@ -87,6 +87,7 @@ MonoBehaviour:
   objectsTilemap: {fileID: 0}
   decorTilemap: {fileID: 0}
   highlightTilemap: {fileID: 0}
+  previewTilemap: {fileID: 0}
   effectHighlightTilemap: {fileID: 0}
   playerSpawnPoint: {fileID: 7901744147490316323}
   objectiveType: 0
