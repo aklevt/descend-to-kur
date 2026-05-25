@@ -15,10 +15,12 @@ namespace Stats
         public int MoveRange;
         public int AttackDamage;
         public int Freeze;
+        public int ShieldTurns;
 
         [Header("Player Only")]
         public int Energy;
         public int MaxEnergy;
+        public int FrozenEnergy;
         public int RemainingSteps;
         public int MaxStepsPerRound;
 
@@ -81,7 +83,11 @@ namespace Stats
 
         public bool HasEnergyForAction(int cost) => Energy >= cost;
         public void SpendEnergy(int amount) => Energy = Mathf.Max(0, Energy - amount);
-        public void RestoreEnergy(int amount) => Energy = Mathf.Min(MaxEnergy, Energy + amount);
+        public void RestoreEnergy(int amount) 
+        {
+            var accessibleMax = MaxEnergy - FrozenEnergy;
+            Energy = Mathf.Min(accessibleMax, Energy + amount);
+        }
         
         public void ResetSteps() => RemainingSteps = Mathf.Min(MaxStepsPerRound, Energy);
         public void ResetStepsTo(int maxSteps) => RemainingSteps = maxSteps;
@@ -96,6 +102,26 @@ namespace Stats
         public void ApplyHeal(int amount)
         {
             Health = Mathf.Min(MaxHealth, Health + amount);
+        }
+        
+        public bool HasActiveShield => ShieldTurns > 0;
+        
+        public void ProcessShieldEffect()
+        {
+            if (ShieldTurns > 0)
+            {
+                ShieldTurns--;
+                if (ShieldTurns == 0)
+                {
+                    Debug.Log($"Щит всё");
+                }
+            }
+        }
+        
+        public void ApplyShield(int turns)
+        {
+            ShieldTurns = Mathf.Max(ShieldTurns, turns);
+            Debug.Log($"Щит активирован на {ShieldTurns} ходов");
         }
     }
 }

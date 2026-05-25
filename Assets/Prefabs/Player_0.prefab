@@ -113,6 +113,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: eccfb25f92df17f4695c1d1dc604246f, type: 2}
   - {fileID: 11400000, guid: 685b90008ca75fb4b95548e95d58d3e9, type: 2}
   - {fileID: 11400000, guid: 1285b512ed81e7a49a31013897bf5ca7, type: 2}
+  - {fileID: 11400000, guid: 7173b994f11acac46a5c65598c8befe0, type: 2}
+  - {fileID: 11400000, guid: e1699ab5b68e3e2408c9ac9906f37cfa, type: 2}
   baseStats: {fileID: 11400000, guid: 43b02efb37ef8ac41aedc492ac640db1, type: 2}
   stats:
     isCustomized: 0
@@ -121,6 +123,7 @@ MonoBehaviour:
     MoveRange: 3
     AttackDamage: 5
     Freeze: 0
+    ShieldTurns: 0
     Energy: 10
     MaxEnergy: 10
     RemainingSteps: 3

@@ -343,6 +343,11 @@ public class GridManager : MonoBehaviour
     
         return true;
     }
+    
+    public bool HasFloor(Vector3Int cellPos)
+    {
+        return floorTilemap != null && floorTilemap.HasTile(cellPos);
+    }
 
     #endregion
     

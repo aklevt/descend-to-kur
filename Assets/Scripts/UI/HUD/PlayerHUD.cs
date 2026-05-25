@@ -50,7 +50,7 @@ namespace UI.HUD
                     lastSteps = stats.RemainingSteps;
                 }
                 
-                stepsText.text = $"Шаги: {stats.RemainingSteps}";
+                stepsText.text = $"{stats.RemainingSteps}";
                 stepsText.color = stats.RemainingSteps > 0 ? Color.white : Color.gray;
             }
             

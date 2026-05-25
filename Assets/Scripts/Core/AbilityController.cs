@@ -24,6 +24,8 @@ namespace Core
         private bool isDead;
         private bool isInputBlocked;
         private bool needsHoverUpdate;
+        
+        public AbilityData SelectedAbility => selectedAbility;
 
         public List<Vector3Int> AvailableCells => availableCells;
 
@@ -249,8 +251,21 @@ namespace Core
 
             if (!IsPlayerTurnActive || selectedAbility == null) return;
 
-            availableCells = selectedAbility.GetTargetCells(PlayerMovement.Instance);
-            GridHighlighter.Instance.HighlightCells(availableCells, selectedAbility.highlightColor);
+            var player = PlayerMovement.Instance;
+
+            availableCells = selectedAbility.GetTargetCells(player);
+            var theoretical = selectedAbility.GetTheoreticalCellsFrom(player.CurrentCell, player);
+
+            var reachableSet = new HashSet<Vector3Int>(availableCells);
+            var faded = new List<Vector3Int>();
+            foreach (var c in theoretical)
+                if (!reachableSet.Contains(c)) faded.Add(c);
+
+            GridHighlighter.Instance.HighlightCellsTwoLayers(
+                faded,
+                availableCells,
+                selectedAbility.highlightColor
+            );
         }
 
         private void ClearSelection()

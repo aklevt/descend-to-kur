@@ -44,6 +44,9 @@ TagManager:
   - name: Highlights
     uniqueID: 1691466705
     locked: 0
+  - name: PreviewCells
+    uniqueID: 1610213851
+    locked: 0
   - name: EffectHighlights
     uniqueID: 3544027909
     locked: 0

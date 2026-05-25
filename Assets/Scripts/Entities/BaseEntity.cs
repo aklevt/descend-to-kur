@@ -222,6 +222,9 @@ namespace Entities
                     Debug.Log($"<color=cyan>{name}</color> разморозился");
                 }
             }
+            
+            stats.ProcessShieldEffect();
+            UpdateVisualStatus();
         }
 
         public void Freeze(int turns)
@@ -450,7 +453,13 @@ namespace Entities
         public void UpdateVisualStatus()
         {
             if (spriteRenderer == null) return;
-            spriteRenderer.color = IsFreeze ? new Color(0.5f, 0.7f, 1f) : Color.white;
+            
+            if (IsFreeze)
+                spriteRenderer.color = new Color(0.5f, 0.7f, 1f);
+            else if (stats.HasActiveShield)
+                spriteRenderer.color = new Color(1f, 1f, 0.5f);
+            else
+                spriteRenderer.color = Color.white;
         }
 
         /// <summary>

@@ -25,7 +25,13 @@ public class Health : MonoBehaviour
     public void TakeDamage(int damage)
     {
         if (isDying || IsDead || !entity) return;
-
+        
+        if (entity.Stats.HasActiveShield)
+        {
+            Debug.Log($"<color=yellow>[Health]</color> Урон {damage} поглощен щитом для {gameObject.name}");
+            StartCoroutine(FlashGold());
+            return;
+        }
 
         entity.Stats.ApplyDamage(damage);
         
@@ -59,6 +65,19 @@ public class Health : MonoBehaviour
     
         spriteRenderer.color = Color.green;
         yield return new WaitForSeconds(0.1f);
+    
+        if (entity != null)
+        {
+            entity.UpdateVisualStatus();
+        }
+    }
+    
+    private IEnumerator FlashGold()
+    {
+        if (spriteRenderer == null) yield break;
+    
+        spriteRenderer.color = Color.yellow;
+        yield return new WaitForSeconds(0.15f);
     
         if (entity != null)
         {
