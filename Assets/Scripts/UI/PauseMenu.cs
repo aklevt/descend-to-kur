@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace UI
@@ -8,20 +9,27 @@ namespace UI
     {
         [SerializeField] private GameObject panel;
         [SerializeField] private Button resumeButton;
-        [SerializeField] private Button quitButton;
+        [SerializeField] private Button mainMenuButton;
         [SerializeField] private Button restartButton;
+
+        [Header("Scene Names")] [SerializeField]
+        private string mainMenuSceneName = "MainMenu";
+
+        [Header("Audio")] [SerializeField] private Slider volumeSlider;
+        [SerializeField] private TextMeshProUGUI volumeText;
 
         private void Start()
         {
             if (resumeButton != null)
                 resumeButton.onClick.AddListener(OnResumeClicked);
-            
+
             if (restartButton != null)
                 restartButton.onClick.AddListener(OnRestartClicked);
 
-            if (quitButton != null)
-                quitButton.onClick.AddListener(OnQuitClicked);
-
+            if (mainMenuButton != null)
+                mainMenuButton.onClick.AddListener(OnMainMenuClicked);
+            
+            SetupAudio();
             // Hide();
         }
 
@@ -41,24 +49,88 @@ namespace UI
         {
             UIManager.Instance?.TogglePause();
         }
-        
+
         private void OnRestartClicked()
         {
             Debug.Log("[PauseMenu] Комната перезапускается");
-            
+
             UIManager.Instance?.TogglePause();
-            
+
             Core.LevelController.Instance?.RestartCurrentRoom();
         }
 
-        private void OnQuitClicked()
+        private void OnMainMenuClicked()
         {
-            Debug.Log("[PauseMenu] Quit button pressed");
-            Application.Quit();
-            
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#endif
+            Debug.Log("[PauseMenu] Возврат в главное меню");
+
+            Core.SaveSystem.SaveGame();
+
+            Time.timeScale = 1f;
+
+            SceneManager.LoadScene(mainMenuSceneName);
         }
+
+
+        //         private void OnMainMenuClicked()
+        //         {
+        //             Debug.Log("[PauseMenu] Quit button pressed");
+        //             Application.Quit();
+        //             
+        // #if UNITY_EDITOR
+        //             UnityEditor.EditorApplication.isPlaying = false;
+        // #endif
+        //         }
+
+        #region Audio
+        
+        private void SetupAudio()
+        {
+            if (volumeSlider != null)
+            {
+                volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
+                
+                LoadAudioSettings();
+            }
+        }
+        
+        /// <summary>
+        /// Загрузка сохраненных настроек звука
+        /// </summary>
+        private void LoadAudioSettings()
+        {
+            if (volumeSlider == null) return;
+
+            var savedVolume = PlayerPrefs.GetFloat("MasterVolume", 1f);
+            
+            volumeSlider.SetValueWithoutNotify(savedVolume);
+            
+            AudioListener.volume = savedVolume;
+            
+            UpdateVolumeText();
+        }
+
+        private void OnVolumeChanged(float value)
+        {
+            AudioListener.volume = value;
+            PlayerPrefs.SetFloat("MasterVolume", value);
+            PlayerPrefs.Save();
+            UpdateVolumeText();
+        }
+
+        private void UpdateVolumeText()
+        {
+            if (volumeText != null)
+                volumeText.text = $"{(int)(volumeSlider.value * 100)}%";
+        }
+
+        private void OnEnable()
+        {
+            if (volumeSlider != null && PlayerPrefs.HasKey("MasterVolume"))
+            {
+                volumeSlider.value = PlayerPrefs.GetFloat("MasterVolume", 1f);
+            }
+        }
+
+        #endregion
     }
 }

@@ -22,7 +22,7 @@ namespace Core
             if (Instance == null)
             {
                 Instance = this;
-                DontDestroyOnLoad(gameObject);
+                // DontDestroyOnLoad(gameObject);
             }
             else
                 Destroy(gameObject);
@@ -70,6 +70,7 @@ namespace Core
 
     public enum GameState
     {
+        MainMenu,
         Gameplay,   // Обычная игра
         Tutorial,   // Обучение (время основной игры заморожено)
         Dialog,     // Диалог (время идёт, ходы заблокированы)

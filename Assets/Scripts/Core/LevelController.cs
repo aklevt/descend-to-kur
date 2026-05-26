@@ -32,7 +32,7 @@ namespace Core
             if (Instance == null)
             {
                 Instance = this;
-                DontDestroyOnLoad(gameObject);
+                // DontDestroyOnLoad(gameObject);
             }
             else
                 Destroy(gameObject);
@@ -40,6 +40,17 @@ namespace Core
 
         private void Start()
         {
+            if (SaveSystem.TryApplyPendingData(out var savedRoomIndex))
+            {
+                Debug.Log($"<color=cyan>[LevelController]</color> Загрузка комнаты из сохранения: {savedRoomIndex}");
+                currentRoomIndex = savedRoomIndex;
+            }
+            else
+            {
+                Debug.Log("<color=cyan>[LevelController]</color> Старт с комнаты 0");
+                currentRoomIndex = 0;
+            }
+            
             if (roomPrefabs != null && roomPrefabs.Count > 0)
             {
                 LoadRoomByIndex(currentRoomIndex);

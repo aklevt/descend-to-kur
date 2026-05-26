@@ -7,24 +7,42 @@ namespace UI.Dialogue
     /// </summary>
     public static class DialogueProgress
     {
-        private static HashSet<string> completedDialogues = new HashSet<string>();
-        
+        private static HashSet<string> _completedDialogues = new HashSet<string>();
+
         public static bool IsCompleted(string dialogueID)
         {
-            return completedDialogues.Contains(dialogueID);
+            return _completedDialogues.Contains(dialogueID);
         }
-        
+
         public static void MarkCompleted(string dialogueID)
         {
-            completedDialogues.Add(dialogueID);
+            _completedDialogues.Add(dialogueID);
         }
-        
+
+        /// <summary>
+        /// Возвращает копию прогресса в виде списка для сериализации в JSON
+        /// </summary>
+        public static List<string> GetCompletedDialoguesList()
+        {
+            return new List<string>(_completedDialogues);
+        }
+
+        /// <summary>
+        /// Заполняет прогресс из сохраненного списка
+        /// </summary>
+        public static void LoadFromList(List<string> loadedList)
+        {
+            _completedDialogues = loadedList != null
+                ? new HashSet<string>(loadedList)
+                : new HashSet<string>();
+        }
+
         /// <summary>
         /// Сбросить все диалоги 
         /// </summary>
-        public static void ResetAll() // ❗ Добавить в меню на кнопку Новая игра, т.к. статические классы живут дольше, чем сцены
+        public static void ResetAll()
         {
-            completedDialogues.Clear();
+            _completedDialogues.Clear();
         }
     }
 }

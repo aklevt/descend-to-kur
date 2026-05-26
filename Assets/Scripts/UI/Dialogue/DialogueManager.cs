@@ -42,12 +42,12 @@ namespace UI.Dialogue
             InitializeViews();
         }
 
-        private void Update()
-        {
-            if (!dialogueState.IsActive) return;
-            
-            HandleDialogueInput();
-        }
+        // private void Update()
+        // {
+        //     if (!dialogueState.IsActive) return;
+        //     
+        //     HandleDialogueInput();
+        // }
 
         private void InitializeViews()
         {

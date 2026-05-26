@@ -39,6 +39,7 @@ namespace Core
                 case GameState.Dialog:
                 case GameState.Tutorial:
                     HandleCameraInput(); 
+                    HandleDialogueInput();
                     break;
                     
                 case GameState.Paused:
@@ -55,7 +56,35 @@ namespace Core
         {
             if (Keyboard.current?.escapeKey.wasPressedThisFrame == true)
             {
+                var gameState = GameStateManager.Instance?.CurrentState ?? GameState.Gameplay;
+        
+                if (gameState is GameState.Dialog or GameState.Tutorial) return;
+                
                 UI.UIManager.Instance?.HandleEscapePress();
+            }
+        }
+        
+        private void HandleDialogueInput()
+        {
+            var kb = Keyboard.current;
+            var mouse = Mouse.current;
+    
+            if (kb != null && kb.escapeKey.wasPressedThisFrame)
+            {
+                UI.Dialogue.DialogueManager.Instance?.SkipDialogue();
+                return;
+            }
+
+            var advancePressed = kb != null && (kb.spaceKey.wasPressedThisFrame || kb.enterKey.wasPressedThisFrame);
+
+            if (mouse != null && mouse.leftButton.wasPressedThisFrame)
+            {
+                advancePressed = true;
+            }
+
+            if (advancePressed)
+            {
+                UI.Dialogue.DialogueManager.Instance?.AdvanceDialogue();
             }
         }
         
