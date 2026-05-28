@@ -63,14 +63,10 @@ namespace Abilities
                 {
                     targetHealth?.TakeDamage(damage);
                     CameraFollow.Instance?.ShakeHeavy();
+                    ApplyKnockback(targetEntity, knockbackDir);
                 },
                 forceProceduralPunch
             ));
-
-
-            yield return new WaitForSeconds(actor.GetScaledTime(impactPause));
-
-            ApplyKnockback(targetEntity, knockbackDir);
 
             while (targetEntity != null && targetEntity.IsMoving)
             {
@@ -105,7 +101,7 @@ namespace Abilities
             if (finalCell != target.CurrentCell)
             {
                 Debug.Log($"[TankPunch] Отброс {target.gameObject.name}: {target.CurrentCell} -> {finalCell}");
-                target.MoveDirectly(finalCell);
+                target.MoveDirectly(finalCell, playWalkAnimation:false);
             }
         }
     }

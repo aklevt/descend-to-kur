@@ -309,8 +309,11 @@ namespace Entities
 
             GridManager.Instance.TriggerTileObjectEnter(CurrentCell, this);
         }
-
-        public void MoveDirectly(Vector3Int targetCell)
+        
+        /// <summary>
+        /// Перемещение по прямой (для отбрасывания)
+        /// </summary>
+        public void MoveDirectly(Vector3Int targetCell, bool playWalkAnimation = false)
         {
             FlipToTarget(targetCell);
             GridManager.Instance.MoveEntity(CurrentCell, targetCell, gameObject);
@@ -322,7 +325,7 @@ namespace Entities
             targetWorldPos.z = transform.position.z;
             IsMoving = true;
 
-            UpdateMovementAnimation(true);
+            UpdateMovementAnimation(playWalkAnimation);
         }
 
         /// <summary>
