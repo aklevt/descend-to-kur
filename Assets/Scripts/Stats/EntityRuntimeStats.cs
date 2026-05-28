@@ -15,10 +15,12 @@ namespace Stats
         public int MoveRange;
         public int AttackDamage;
         public int Freeze;
+        public int ShieldTurns;
 
         [Header("Player Only")]
         public int Energy;
         public int MaxEnergy;
+        public int FrozenEnergy;
         public int RemainingSteps;
         public int MaxStepsPerRound;
 
@@ -27,6 +29,8 @@ namespace Stats
         public int PreferredAttackRange;
         [Tooltip("Минимальная дистанция до игрока (0 = не отступать)")]
         public int MinimumRange;
+        [Tooltip("Радиус обнаружения игрока (0 = бесконечный)")]
+        public int DetectionRadius;
 
         public EntityRuntimeStats()
         {
@@ -61,16 +65,32 @@ namespace Stats
             {
                 PreferredAttackRange = enemyData.preferredAttackRange;
                 MinimumRange = enemyData.minimumRange;
+                DetectionRadius = enemyData.detectionRadius;
             }
         }
 
         public bool IsDead => Health <= 0;
+        
+        /// <summary>
+        /// Проверяет, находится ли цель в радиусе обнаружения (0 = бесконечный радиус)
+        /// </summary>
+        public bool IsInDetectionRange(Vector3Int from, Vector3Int target)
+        {
+            if (DetectionRadius <= 0) return true;
+            var distance = Mathf.Abs(from.x - target.x) + Mathf.Abs(from.y - target.y);
+            return distance <= DetectionRadius;
+        }
 
         public bool HasEnergyForAction(int cost) => Energy >= cost;
         public void SpendEnergy(int amount) => Energy = Mathf.Max(0, Energy - amount);
-        public void RestoreEnergy(int amount) => Energy = Mathf.Min(MaxEnergy, Energy + amount);
+        public void RestoreEnergy(int amount) 
+        {
+            var accessibleMax = MaxEnergy - FrozenEnergy;
+            Energy = Mathf.Min(accessibleMax, Energy + amount);
+        }
         
-        public void ResetSteps(int maxSteps) => RemainingSteps = maxSteps;
+        public void ResetSteps() => RemainingSteps = Mathf.Min(MaxStepsPerRound, Energy);
+        public void ResetStepsTo(int maxSteps) => RemainingSteps = maxSteps;
         public bool CanMove(int distance) => RemainingSteps >= distance;
         public void SpendSteps(int distance) => RemainingSteps = Mathf.Max(0, RemainingSteps - distance);
 
@@ -82,6 +102,26 @@ namespace Stats
         public void ApplyHeal(int amount)
         {
             Health = Mathf.Min(MaxHealth, Health + amount);
+        }
+        
+        public bool HasActiveShield => ShieldTurns > 0;
+        
+        public void ProcessShieldEffect()
+        {
+            if (ShieldTurns > 0)
+            {
+                ShieldTurns--;
+                if (ShieldTurns == 0)
+                {
+                    Debug.Log($"Щит всё");
+                }
+            }
+        }
+        
+        public void ApplyShield(int turns)
+        {
+            ShieldTurns = Mathf.Max(ShieldTurns, turns);
+            Debug.Log($"Щит активирован на {ShieldTurns} ходов");
         }
     }
 }

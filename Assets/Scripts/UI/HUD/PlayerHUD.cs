@@ -16,7 +16,7 @@ namespace UI.HUD
         [SerializeField] private Slider stepsSlider;
 
         private int lastSteps = -1;
-        private int lastEnergy = -1;
+        private int lastEnergy;
 
         private void Update()
         {
@@ -50,7 +50,7 @@ namespace UI.HUD
                     lastSteps = stats.RemainingSteps;
                 }
                 
-                stepsText.text = $"Шаги: {stats.RemainingSteps}";
+                stepsText.text = $"{stats.RemainingSteps}";
                 stepsText.color = stats.RemainingSteps > 0 ? Color.white : Color.gray;
             }
             

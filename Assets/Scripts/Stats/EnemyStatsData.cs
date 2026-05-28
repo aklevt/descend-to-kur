@@ -11,5 +11,8 @@ namespace Stats
         
         [Tooltip("Минимальная дистанция до игрока (0 = не отступать)")]
         public int minimumRange = 0;
+        
+        [Tooltip("Радиус обнаружения игрока (0 = бесконечный)")]
+        public int detectionRadius = 0;
     }
 }

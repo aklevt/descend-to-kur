@@ -22,7 +22,14 @@ namespace Abilities
 
         [Header("Colors")] public Color highlightColor = Color.white; //  Color.black;
         public Color effectColor = new Color(1f, 0.2f, 0.2f, 0.9f); //new Color(0f, 0f, 0f, 0.9f);
+        
+        [Header("Animation Settings")]
+        [Tooltip("Использовать процедурную анимацию удара вместе с Animator'ом. Если false, будет проигрываться только анимация из Animator'а, и она должна быть универсальной для всех направлений атаки")]
+        public bool forceProceduralPunch = false;
 
+        [Tooltip("Использовать диагональную анимацию для вертикальных атак")]
+        public bool useDiagonalPunch = false;
+        
         /// <summary>
         /// Рассчитывает итоговый урон на основе статов атакующего
         /// </summary>
@@ -105,5 +112,14 @@ namespace Abilities
         {
             return true;
         }
+        
+        /// <summary>
+        /// Полный геометрический радиус способности без учёта препятствий/сущностей.
+        /// Используется для слабой подсветки общего радиуса в UI.
+        /// По-умолчанию совпадает с реально доступными клетками.
+        /// Переопределяется в способностях, где есть смысл показать общий радиус.
+        /// </summary>
+        public virtual List<Vector3Int> GetTheoreticalCellsFrom(Vector3Int position, BaseEntity actor)
+            => GetTargetCellsFrom(position, actor);
     }
 }

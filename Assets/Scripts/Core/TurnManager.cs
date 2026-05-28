@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Room;
 using Entities;
 using Settings;
 
@@ -14,10 +15,21 @@ public class TurnManager : MonoBehaviour
     private List<EnemyBase> allEnemies = new();
     private IEnumerator EnemyTurnSequence()
     {
-        var savedEnemiesList = new List<EnemyBase>(allEnemies);
-        var activeEnemies = savedEnemiesList
-            .Where(e => e != null)
-            .ToList();
+        var activeEnemies = new List<EnemyBase>();
+    
+        if (RoomController.Current != null)
+        {
+            activeEnemies = RoomController.Current.GetActiveEnemiesForTurn();
+            // Debug.Log(activeEnemies.Count);
+        }
+    
+        if (activeEnemies.Count == 0)
+        {
+            yield return ProcessEndOfRound();
+            SetState(TurnState.PlayerTurn);
+            CameraFollow.Instance?.ResetFocus();
+            yield break;
+        }
         
         var allFrozen = activeEnemies.Count > 0 && activeEnemies.All(e => e.IsFreeze);
         
@@ -184,10 +196,16 @@ public class TurnManager : MonoBehaviour
 
     public void EndPlayerTurn()
     {
-        if (CurrentState == TurnState.PlayerTurn)
+        if (CurrentState != TurnState.PlayerTurn)
+            return;
+    
+        if (PlayerMovement.Instance != null)
         {
-            SetState(TurnState.EnemyTurn);
+            var playerCell = PlayerMovement.Instance.CurrentCell;
+            GridManager.Instance.TriggerTileObjectEndTurn(playerCell, PlayerMovement.Instance);
         }
+    
+        SetState(TurnState.EnemyTurn);
     }
 
     public void ResetEnemies()

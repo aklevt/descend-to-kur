@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Core;
+using Core.Room;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -34,14 +36,14 @@ public class FogSystemManager : MonoBehaviour
     /// </summary>
     public void ScaleToCurrentRoom()
     {
-        var roomController = FindObjectOfType<RoomController>();
-        if (roomController?.obstacleTilemap != null)
+        var roomController = FindFirstObjectByType<RoomController>();
+        if (roomController?.wallsTilemap != null)
         {
-            ScaleToTilemap(roomController.obstacleTilemap);
+            ScaleToTilemap(roomController.wallsTilemap);
         }
         else
         {
-            var tilemap = FindObjectOfType<Tilemap>();
+            var tilemap = FindFirstObjectByType<Tilemap>();
             if (tilemap != null)
             {
                 ScaleToTilemap(tilemap);

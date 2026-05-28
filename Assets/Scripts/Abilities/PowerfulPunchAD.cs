@@ -100,12 +100,33 @@ namespace Abilities
 
         private void KnobackEnemy(Vector3Int direction, BaseEntity entity)
         {
-            var canKnoback = GridManager.Instance.IsCellWalkable(entity.CurrentCell + direction);
-            var canFarKnoback = GridManager.Instance.IsCellWalkable(entity.CurrentCell + 2 * direction);
-            if (canKnoback && canFarKnoback)
-                entity.MoveDirectly(entity.CurrentCell + 2 * direction);
-            else if (canKnoback)
-                entity.MoveDirectly(entity.CurrentCell + direction);
+            var cell1 = entity.CurrentCell + direction;
+            var cell2 = entity.CurrentCell + 2 * direction;
+    
+            if (!GridManager.Instance.IsCellKnockbackable(cell1))
+            {
+                return;
+            }
+    
+            if (GridManager.Instance.HasBlockingTileObject(cell1))
+            {
+                entity.MoveDirectly(cell1);
+                return;
+            }
+    
+            if (!GridManager.Instance.IsCellKnockbackable(cell2))
+            {
+                entity.MoveDirectly(cell1);
+                return;
+            }
+    
+            if (GridManager.Instance.HasBlockingTileObject(cell2))
+            {
+                entity.MoveDirectly(cell2);
+                return;
+            }
+    
+            entity.MoveDirectly(cell2);
         }
     }
 }

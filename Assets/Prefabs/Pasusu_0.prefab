@@ -59,7 +59,7 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 1268132063
+  m_SortingLayerID: 743415277
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!114 &8152214643922246499
@@ -431,7 +431,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameScripts::Entities.RangedEnemy
   abilities:
-  - {fileID: 11400000, guid: 510f43a55085f9947a0ea1fb548d53da, type: 2}
+  - {fileID: 11400000, guid: b9b038928a69cb54f8ef8be806c52911, type: 2}
   baseStats: {fileID: 11400000, guid: 762b31e23df083548a2538f583bf32f7, type: 2}
   stats:
     isCustomized: 0
@@ -446,6 +446,7 @@ MonoBehaviour:
     MaxStepsPerRound: 3
     PreferredAttackRange: 3
     MinimumRange: 2
+    DetectionRadius: 0
   localAnimationSpeedMultiplier: 1
   projectileSpawnOffset: {x: 0.36, y: 0.9}
   spriteRenderer: {fileID: 1379945844017360337}

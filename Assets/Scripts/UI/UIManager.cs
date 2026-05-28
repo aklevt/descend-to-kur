@@ -69,10 +69,6 @@ namespace UI
                     break;
                 case Core.GameState.Tutorial:
                     break;
-                    break;
-                    break;
-                    break;
-                    break;
             }
         }
 

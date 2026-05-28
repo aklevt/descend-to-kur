@@ -17,4 +17,4 @@ MonoBehaviour:
   bonusDamage: 0
   overrideBaseDamage: 1
   highlightColor: {r: 1, g: 1, b: 1, a: 1}
-  effectColor: {r: 0.4828231, g: 0.6603774, b: 0.65856355, a: 1}
+  effectColor: {r: 0.26855642, g: 0.5312076, b: 0.6698113, a: 0.80784315}

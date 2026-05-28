@@ -51,7 +51,7 @@ namespace UI
             ShowWarning("Доступные шаги закончились!");
         }
         
-        private void ShowWarning(string message)
+        public void ShowWarning(string message)
         {
             if (warningPopup == null) return;
             if (isSuppressed) return;

@@ -22,8 +22,25 @@ namespace Abilities
 
         public override List<Vector3Int> GetTargetCellsFrom(Vector3Int origin, BaseEntity actor)
         {
-            return GridManager.Instance.GetAttackableCellsInRadius(origin, maxRange, minRange);
+            var allCells = GridManager.Instance.GetAttackableCellsInRadius(origin, maxRange, minRange);
+            var shootableCells = new List<Vector3Int>();
+
+            foreach (var cell in allCells)
+            {
+                // Клетка простреливаема
+                if (!GridManager.Instance.IsCellShootable(cell))
+                    continue;
+
+                // Есть линия видимости
+                if (!GridManager.Instance.HasLineOfSight(origin, cell))
+                    continue;
+
+                shootableCells.Add(cell);
+            }
+
+            return shootableCells;
         }
+
 
         public override List<Vector3Int> GetEffectCells(Vector3Int hoveredCell, BaseEntity actor)
             => new List<Vector3Int> { hoveredCell };
@@ -45,6 +62,25 @@ namespace Abilities
             var target = GridManager.Instance.GetEntityAt(targetCell);
             return target != null;
         }
+        
+        public override List<Vector3Int> GetTheoreticalCellsFrom(Vector3Int origin, BaseEntity actor)
+        {
+            var result = new List<Vector3Int>();
+
+            for (var dx = -maxRange; dx <= maxRange; dx++)
+            for (var dy = -maxRange; dy <= maxRange; dy++)
+            {
+                var manh = Mathf.Abs(dx) + Mathf.Abs(dy);
+                if (manh < minRange || manh > maxRange) continue;
+
+                var cell = new Vector3Int(origin.x + dx, origin.y + dy, origin.z);
+                if (!GridManager.Instance.HasFloor(cell)) continue;
+
+                result.Add(cell);
+            }
+
+            return result;
+        }
 
         public override IEnumerator Execute(BaseEntity actor, Vector3Int targetCell)
         {
@@ -56,13 +92,15 @@ namespace Abilities
 
             actor.FlipToTarget(targetPos);
 
-            yield return new WaitForSeconds(actor.GetScaledTime(0.1f));
-
-            // Эффект подготовки (Particle system)
+            yield return actor.StartCoroutine(actor.PerformCast("RangedAttack", () =>
+            {
+                actor.StartCoroutine(LaunchProjectileSequence(actor, targetPos, targetObj, damage));
+            }));
+        }
+        
+        private IEnumerator LaunchProjectileSequence(BaseEntity actor, Vector3 targetPos, GameObject targetObj, int damage)
+        {
             var spawnPos = actor.GetProjectileSpawnPosition();
-            yield return PlayChargeEffect(spawnPos, actor);
-
-            // Запуск снаряда (в world-координатах)
             if (projectilePrefab != null)
             {
                 yield return LaunchProjectile(spawnPos, targetPos, targetObj, damage, actor);
@@ -71,7 +109,6 @@ namespace Abilities
             {
                 targetObj.GetComponent<Health>()?.TakeDamage(damage);
                 CameraFollow.Instance?.ShakeMedium();
-                yield return new WaitForSeconds(actor.GetScaledTime(0.05f));
             }
         }
 

@@ -52,9 +52,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c75fa3365273fc0439aed449d3cd81cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameScripts::RoomData
-  obstacleTilemap: {fileID: 5781693641500076882}
-  selectionTilemap: {fileID: 4132732187237311469}
-  effectTilemap: {fileID: 41294244230202734}
+  floorTilemap: {fileID: 0}
+  wallsTilemap: {fileID: 0}
+  wallsInnerTilemap: {fileID: 0}
+  obstaclesTilemap: {fileID: 0}
+  objectsTilemap: {fileID: 0}
+  decorTilemap: {fileID: 0}
+  highlightTilemap: {fileID: 0}
+  previewTilemap: {fileID: 0}
+  effectHighlightTilemap: {fileID: 0}
   playerSpawnPoint: {fileID: 7901744147490316323}
   objectiveType: 0
   victoryMessage: "\u041A\u043E\u043C\u043D\u0430\u0442\u0430 \u043F\u0440\u043E\u0439\u0434\u0435\u043D\u0430"
@@ -175,7 +181,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 1691466705
-  m_SortingLayer: -2
+  m_SortingLayer: -3
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
@@ -5242,7 +5248,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: -917315931
-  m_SortingLayer: -3
+  m_SortingLayer: -4
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}

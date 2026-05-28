@@ -120,6 +120,9 @@ public class GridPathfinder
 
                 if (visited.Contains(next) || !gridManager.IsCellPassable(next, options))
                     continue;
+                
+                if (options.boundaryCheck != null && !options.boundaryCheck(next))
+                    continue;
 
                 visited.Add(next);
                 queue.Enqueue((next, steps + 1));
@@ -151,7 +154,9 @@ public class GridPathfinder
 
                 var cellPos = new Vector3Int(center.x + x, center.y + y, center.z);
 
-                if (gridManager.IsCellPassable(cellPos, options))
+                if (options.useBFS 
+                        ? gridManager.IsCellPassable(cellPos, options)
+                        : gridManager.IsCellTargetable(cellPos))
                 {
                     cells.Add(cellPos);
                 }
@@ -166,13 +171,12 @@ public class GridPathfinder
     /// </summary>
     /// <param name="start">Начальная клетка</param>
     /// <param name="target">Целевая клетка</param>
-    /// <param name="currentEntity">Сущность для которой строится путь</param>
+    /// <param name="options">Набор опций (например, сущность, для которой строится путь)</param>
     /// <returns>Список клеток пути (включая start и target) или пустой список если путь не найден</returns>
-    public List<Vector3Int> GetPath(Vector3Int start, Vector3Int target, GameObject currentEntity = null)
+    public List<Vector3Int> GetPath(Vector3Int start, Vector3Int target, CellCheckOptions options)
     {
         if (start == target) return new List<Vector3Int> { start };
 
-        var options = CellCheckOptions.ForMovement(currentEntity);
         var queue = new Queue<Vector3Int>();
         var visited = new HashSet<Vector3Int> { start };
         var parent = new Dictionary<Vector3Int, Vector3Int>();
@@ -196,6 +200,9 @@ public class GridPathfinder
                 }
 
                 if (visited.Contains(next) || !gridManager.IsCellPassable(next, options))
+                    continue;
+                
+                if (options.boundaryCheck != null && !options.boundaryCheck(next))
                     continue;
 
                 visited.Add(next);

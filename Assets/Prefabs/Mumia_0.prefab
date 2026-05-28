@@ -300,6 +300,7 @@ GameObject:
   - component: {fileID: 5927671120677486074}
   - component: {fileID: 1791857300127426153}
   - component: {fileID: 2809698832690530192}
+  - component: {fileID: 325104949946672996}
   m_Layer: 0
   m_Name: Mumia_0
   m_TagString: Untagged
@@ -372,7 +373,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -5621593187482372676, guid: c8e0430e86ea84e4290e948b661302f1, type: 3}
+  m_Sprite: {fileID: -1192261352622557908, guid: 8642fed5de781ac4080513eb0f53525d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -417,17 +418,42 @@ MonoBehaviour:
     MoveRange: 2
     AttackDamage: 5
     Freeze: 0
+    ShieldTurns: 0
     Energy: 0
     MaxEnergy: 0
+    FrozenEnergy: 0
     RemainingSteps: 0
     MaxStepsPerRound: 0
     PreferredAttackRange: 1
     MinimumRange: 0
+    DetectionRadius: 0
   localAnimationSpeedMultiplier: 1
   projectileSpawnOffset: {x: 0.3, y: 0.5}
   spriteRenderer: {fileID: 5927671120677486074}
   animator: {fileID: 0}
   isGridInitialized: 0
+--- !u!95 &325104949946672996
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6597359993218044056}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 952f82c1efb19a8439991e18b0101b3e, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &7507143231325615437
 GameObject:
   m_ObjectHideFlags: 0
@@ -487,7 +513,7 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 1268132063
+  m_SortingLayerID: 743415277
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!114 &6340786946617621748

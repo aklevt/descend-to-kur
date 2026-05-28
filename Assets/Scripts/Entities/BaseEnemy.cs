@@ -1,6 +1,10 @@
 using System.Collections;
 using System.Linq;
+using Abilities;
+using Core;
+using Core.Room;
 using UnityEngine;
+using Entities.AI;
 
 namespace Entities
 {
@@ -10,7 +14,7 @@ namespace Entities
     /// </summary>
     public abstract class EnemyBase : BaseEntity
     {
-        private EnemyAI enemyAI = new EnemyAI();
+        private IEnemyAI enemyAI;
 
         #region Initialization
 
@@ -18,6 +22,8 @@ namespace Entities
         {
             base.Start();
             InitializeOnGrid();
+            
+            enemyAI = CreateAI();
 
             if (TurnManager.Instance != null)
             {
@@ -29,6 +35,20 @@ namespace Entities
         {
             if (TurnManager.Instance != null)
                 TurnManager.Instance.UnregisterEnemy(this);
+        }
+        
+        protected virtual IEnemyAI CreateAI()
+        {
+            if (Abilities.Count > 0)
+            {
+                if (Abilities[0] is QueenRangedAttackAbilityData)
+                    return new QueenRangedEnemyAI();
+
+                if (Abilities[0] is RangedAttackAbilityData)
+                    return new RangedEnemyAI();
+            }
+
+            return new SimpleAttackerEnemyAI();
         }
 
         #endregion
@@ -42,6 +62,12 @@ namespace Entities
         {
             var health = GetComponent<Health>();
             if (health == null || health.IsDead) yield break;
+            
+            if (RoomController.Current != null && !RoomController.Current.IsEnemyActive(this))
+            {
+                Debug.Log($"<color=grey>[{gameObject.name}]</color> Пропуск хода, т.к. секция неактивна");
+                yield break;
+            }
 
             var canAct = OnTurnStart();
 

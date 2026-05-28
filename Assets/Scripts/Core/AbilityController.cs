@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Abilities;
+using Core.Room;
 using Entities;
 using Stats;
 using UI;
@@ -23,6 +24,8 @@ namespace Core
         private bool isDead;
         private bool isInputBlocked;
         private bool needsHoverUpdate;
+        
+        public AbilityData SelectedAbility => selectedAbility;
 
         public List<Vector3Int> AvailableCells => availableCells;
 
@@ -165,9 +168,19 @@ namespace Core
         /// </summary>
         private bool ValidateAbilityUsage(Vector3Int targetCell)
         {
+            if (RoomController.Current != null)
+            {
+                var roomCheck = RoomController.Current.ValidateActionInRoom(targetCell, selectedAbility);
+        
+                if (!roomCheck.Success)
+                {
+                    UIController.Instance?.ShowWarning(roomCheck.ErrorMessage);
+                    return false;
+                }
+            }
+
             return validator.CanUseAbilityOnTarget(selectedAbility, targetCell, availableCells);
         }
-
 
         public void HandleCellHover(Vector3Int hoveredCell)
         {
@@ -238,8 +251,21 @@ namespace Core
 
             if (!IsPlayerTurnActive || selectedAbility == null) return;
 
-            availableCells = selectedAbility.GetTargetCells(PlayerMovement.Instance);
-            GridHighlighter.Instance.HighlightCells(availableCells, selectedAbility.highlightColor);
+            var player = PlayerMovement.Instance;
+
+            availableCells = selectedAbility.GetTargetCells(player);
+            var theoretical = selectedAbility.GetTheoreticalCellsFrom(player.CurrentCell, player);
+
+            var reachableSet = new HashSet<Vector3Int>(availableCells);
+            var faded = new List<Vector3Int>();
+            foreach (var c in theoretical)
+                if (!reachableSet.Contains(c)) faded.Add(c);
+
+            GridHighlighter.Instance.HighlightCellsTwoLayers(
+                faded,
+                availableCells,
+                selectedAbility.highlightColor
+            );
         }
 
         private void ClearSelection()
