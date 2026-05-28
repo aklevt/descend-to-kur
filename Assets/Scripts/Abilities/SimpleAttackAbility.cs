@@ -15,7 +15,7 @@ namespace Abilities
 
         public override List<Vector3Int> GetEffectCells(Vector3Int hoveredCell, BaseEntity actor)
             => new List<Vector3Int> { hoveredCell };
-        
+
         public override Vector3Int? ChooseTarget(BaseEntity actor)
         {
             var playerCell = PlayerMovement.Instance?.CurrentCell;
@@ -24,7 +24,7 @@ namespace Abilities
             var available = GetTargetCells(actor);
             return available.Contains(playerCell.Value) ? playerCell : null;
         }
-        
+
         /// <summary>
         /// Требует наличие цели на клетке, так как это не aoe-атака
         /// </summary>
@@ -38,16 +38,19 @@ namespace Abilities
         {
             var target = GridManager.Instance.GetEntityAt(targetCell);
             var targetHealth = target.GetComponent<Health>();
-            
+
             var damage = GetCalculatedDamage(actor);
 
-            yield return actor.StartCoroutine(actor.PunchAnimation(
+            yield return actor.StartCoroutine(actor.PerformAttack(
                 target.transform.position,
+                "SimpleAttack",
                 () =>
                 {
                     targetHealth?.TakeDamage(damage);
                     CameraFollow.Instance?.ShakeMedium();
-                }
+                },
+                forceProceduralPunch,
+                useDiagonalPunch
             ));
         }
     }

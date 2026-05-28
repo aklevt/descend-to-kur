@@ -16,12 +16,12 @@ public class TileObjectDatabase : ScriptableObject
 
     public GameObject GetPrefabForTile(TileBase tile)
     {
-        var mapping = mappings.Find(m => m.tile == tile);
-        if (mapping.tile == null)
+        if (!mappings.Exists(m => m.tile == tile))
         {
-            Debug.LogWarning($"[TileObjectDatabase]");
             return null;
         }
+
+        var mapping = mappings.Find(m => m.tile == tile);
         return mapping.entityPrefab;
     }
 }

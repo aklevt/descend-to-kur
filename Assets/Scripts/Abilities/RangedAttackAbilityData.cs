@@ -92,13 +92,15 @@ namespace Abilities
 
             actor.FlipToTarget(targetPos);
 
-            yield return new WaitForSeconds(actor.GetScaledTime(0.1f));
-
-            // Эффект подготовки (Particle system)
+            yield return actor.StartCoroutine(actor.PerformCast("RangedAttack", () =>
+            {
+                actor.StartCoroutine(LaunchProjectileSequence(actor, targetPos, targetObj, damage));
+            }));
+        }
+        
+        private IEnumerator LaunchProjectileSequence(BaseEntity actor, Vector3 targetPos, GameObject targetObj, int damage)
+        {
             var spawnPos = actor.GetProjectileSpawnPosition();
-            yield return PlayChargeEffect(spawnPos, actor);
-
-            // Запуск снаряда (в world-координатах)
             if (projectilePrefab != null)
             {
                 yield return LaunchProjectile(spawnPos, targetPos, targetObj, damage, actor);
@@ -107,7 +109,6 @@ namespace Abilities
             {
                 targetObj.GetComponent<Health>()?.TakeDamage(damage);
                 CameraFollow.Instance?.ShakeMedium();
-                yield return new WaitForSeconds(actor.GetScaledTime(0.05f));
             }
         }
 

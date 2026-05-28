@@ -9,6 +9,10 @@ namespace Settings
         [Range(0.1f, 5f)]
         public float globalAnimationSpeedMultiplier = 1f;
         
+        [Range(0.1f, 3f)] 
+        [Tooltip("Множитель скорости только для Idle анимаций")]
+        public float idleAnimationSpeedMultiplier = 1f;
+        
         [Header("Movement")]
         [Range(1f, 20f)]
         [Tooltip("Базовая скорость передвижения всех сущностей")]

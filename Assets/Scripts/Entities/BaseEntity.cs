@@ -41,7 +41,7 @@ namespace Entities
         public bool IsFreeze => stats.Freeze > 0;
 
         private Vector3 targetWorldPos;
-        
+
         public event Action<Vector3Int> OnCellChanged;
 
         #endregion
@@ -68,6 +68,7 @@ namespace Entities
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
+            InitAnimator();
 
             isGridInitialized = false;
 
@@ -97,7 +98,7 @@ namespace Entities
         public void RespawnAt(Vector3 worldPosition)
         {
             StopAllCoroutines();
-            
+
             // Пусть дебаги пока что остаются, еще нужны будут при склейке сцен
             Debug.Log($"<color=orange>[{name}] Дебаг RespawnAt </color>");
             Debug.Log($"  worldPosition={worldPosition}");
@@ -110,7 +111,7 @@ namespace Entities
             FullRestore();
             SetupGridPosition(worldPosition);
             RegisterOnGrid();
-            
+
             OnCellChanged?.Invoke(CurrentCell);
 
             Debug.Log($"<color=green>[{name}] === Конец дебага RespawnAt ===</color>");
@@ -132,7 +133,7 @@ namespace Entities
         {
             isGridInitialized = false;
             IsMoving = false;
-            
+
             if (isMovingAlongPath)
             {
                 StopCoroutine(nameof(MoveAlongPath));
@@ -222,7 +223,7 @@ namespace Entities
                     Debug.Log($"<color=cyan>{name}</color> разморозился");
                 }
             }
-            
+
             stats.ProcessShieldEffect();
             UpdateVisualStatus();
         }
@@ -259,7 +260,7 @@ namespace Entities
                 isMovingAlongPath = false;
                 currentPath.Clear();
             }
-            
+
             var path = GridManager.Instance.GetPath(CurrentCell, targetCell, gameObject);
             if (path.Count <= 1) return;
             StartCoroutine(MoveAlongPath(path));
@@ -276,6 +277,8 @@ namespace Entities
             currentPath = path;
             currentPathIndex = 1;
 
+            UpdateMovementAnimation(true);
+
             while (currentPathIndex < currentPath.Count)
             {
                 var nextCell = currentPath[currentPathIndex];
@@ -284,9 +287,9 @@ namespace Entities
 
                 GridManager.Instance.MoveEntity(CurrentCell, nextCell, gameObject);
                 CurrentCell = nextCell;
-                
+
                 OnCellChanged?.Invoke(CurrentCell);
-                
+
                 targetWorldPos = GridManager.Instance.GetCellCenterWorld(nextCell);
                 targetWorldPos.z = transform.position.z;
                 IsMoving = true;
@@ -301,7 +304,9 @@ namespace Entities
 
             isMovingAlongPath = false;
             currentPath.Clear();
-            
+
+            UpdateMovementAnimation(false);
+
             GridManager.Instance.TriggerTileObjectEnter(CurrentCell, this);
         }
 
@@ -310,12 +315,14 @@ namespace Entities
             FlipToTarget(targetCell);
             GridManager.Instance.MoveEntity(CurrentCell, targetCell, gameObject);
             CurrentCell = targetCell;
-            
+
             OnCellChanged?.Invoke(CurrentCell);
 
             targetWorldPos = GridManager.Instance.GetCellCenterWorld(targetCell);
             targetWorldPos.z = transform.position.z;
             IsMoving = true;
+
+            UpdateMovementAnimation(true);
         }
 
         /// <summary>
@@ -331,14 +338,14 @@ namespace Entities
                 isMovingAlongPath = false;
                 currentPath.Clear();
             }
-            
+
             GridManager.Instance.UnregisterEntity(CurrentCell);
             CurrentCell = targetCell;
             IsMoving = false;
 
             PlaceOnCell();
             GridManager.Instance.RegisterFixedEntity(CurrentCell, gameObject);
-            
+
             OnCellChanged?.Invoke(CurrentCell);
         }
 
@@ -356,6 +363,11 @@ namespace Entities
             {
                 transform.position = targetWorldPos;
                 IsMoving = false;
+
+                if (!isMovingAlongPath)
+                {
+                    UpdateMovementAnimation(false);
+                }
 
                 OnArrivingToTarget();
             }
@@ -453,7 +465,7 @@ namespace Entities
         public void UpdateVisualStatus()
         {
             if (spriteRenderer == null) return;
-            
+
             if (IsFreeze)
                 spriteRenderer.color = new Color(0.5f, 0.7f, 1f);
             else if (stats.HasActiveShield)
@@ -470,6 +482,325 @@ namespace Entities
             var directionMultiplier = (spriteRenderer != null && spriteRenderer.flipX) ? -1f : 1f;
             var offset = new Vector3(projectileSpawnOffset.x * directionMultiplier, projectileSpawnOffset.y, 0f);
             return transform.position + offset;
+        }
+
+        #endregion
+
+        #region Diagonal Punch Animation
+
+        /// <summary>
+        /// Анимация удара с диагональным смещением для вертикальных атак
+        /// </summary>
+        public IEnumerator DiagonalPunchAnimation(Vector3 targetPos, Action onHit = null)
+        {
+            var startPos = transform.position;
+            var duration = GetScaledTime(0.15f);
+            var elapsed = 0f;
+
+            var isVertical = IsVerticalAttack(startPos, targetPos);
+            var preAttackPos = startPos;
+
+            if (isVertical)
+            {
+                var diagOffset = GetDiagonalOffset(startPos, targetPos);
+
+                if (diagOffset != Vector3.zero)
+                {
+                    UpdateSpriteFlip(-diagOffset.x);
+
+                    preAttackPos = startPos + diagOffset;
+
+                    elapsed = 0f;
+                    while (elapsed < duration * 0.8f)
+                    {
+                        elapsed += Time.deltaTime;
+                        transform.position = Vector3.Lerp(startPos, preAttackPos, elapsed / (duration * 0.8f));
+                        yield return null;
+                    }
+
+                    transform.position = preAttackPos;
+                }
+            }
+            else
+            {
+                FlipToTarget(targetPos);
+            }
+
+            // Выпад к цели
+            var punchPos = Vector3.Lerp(preAttackPos, targetPos, 0.35f);
+            elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                transform.position = Vector3.Lerp(preAttackPos, punchPos, elapsed / duration);
+                yield return null;
+            }
+
+            transform.position = punchPos;
+            onHit?.Invoke();
+
+            yield return new WaitForSeconds(GetScaledTime(0.05f));
+
+            // Возврат на начальную позицию
+            elapsed = 0f;
+            while (elapsed < duration * 1.5f)
+            {
+                elapsed += Time.deltaTime;
+                transform.position = Vector3.Lerp(punchPos, startPos, elapsed / (duration * 1.5f));
+                yield return null;
+            }
+
+            transform.position = startPos;
+        }
+
+        /// <summary>
+        /// Вычисляет диагональное смещение для атаки с учетом препятствий
+        /// </summary>
+        private Vector3 GetDiagonalOffset(Vector3 attackerPos, Vector3 targetPos)
+        {
+            var targetCell = GridManager.Instance.WorldToCell(targetPos);
+
+            var leftCell = targetCell + Vector3Int.left;
+            var rightCell = targetCell + Vector3Int.right;
+
+            var leftFree = IsCellFreeForDiagonalPunch(leftCell);
+            var rightFree = IsCellFreeForDiagonalPunch(rightCell);
+
+            float sideX;
+
+            if (leftFree && rightFree)
+            {
+                var dirToTarget = targetPos.x - attackerPos.x;
+                sideX = dirToTarget > 0 ? 0.25f : -0.25f;
+            }
+            else if (rightFree)
+                sideX = 0.25f;
+            else if (leftFree)
+                sideX = -0.25f;
+            else
+                sideX = 0f;
+
+            var verticalOffset = (targetPos.y - attackerPos.y) * 0.3f;
+
+            return new Vector3(sideX, verticalOffset, 0);
+        }
+
+        /// <summary>
+        /// Проверяет можно ли использовать клетку для диагональной атаки
+        /// Учитывает все препятствия
+        /// </summary>
+        private bool IsCellFreeForDiagonalPunch(Vector3Int cell)
+        {
+            var options = new CellCheckOptions
+            {
+                checkEntities = true,
+                currentEntity = gameObject,
+                useBFS = true
+            };
+
+            return GridManager.Instance.IsCellPassable(cell, options);
+        }
+
+        /// <summary>
+        /// Определяет, вертикальная ли атака
+        /// </summary>
+        private bool IsVerticalAttack(Vector3 from, Vector3 to)
+        {
+            var diff = to - from;
+            return Mathf.Abs(diff.y) > Mathf.Abs(diff.x);
+        }
+
+        #endregion
+
+        #region Animation & Visual Caching
+
+        private HashSet<string> animatorParameters = new();
+        private Action activeHitCallback;
+        private bool hitTriggered;
+
+        protected virtual void InitAnimator()
+        {
+            animator = GetComponent<Animator>();
+            if (animator != null)
+            {
+                foreach (var param in animator.parameters)
+                {
+                    animatorParameters.Add(param.name);
+                }
+
+                animator.speed = GetAnimationSpeedMultiplier();
+            }
+        }
+
+        public bool HasParameter(string paramName) => animatorParameters.Contains(paramName);
+
+        private void UpdateMovementAnimation(bool moving)
+        {
+            if (animator != null && HasParameter("isMoving"))
+            {
+                animator.SetBool("isMoving", moving);
+
+                if (moving)
+                {
+                    animator.speed = GetAnimationSpeedMultiplier();
+                }
+                else
+                {
+                    animator.speed = GetIdleAnimationSpeed();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Скорость для Idle анимации
+        /// </summary>
+        public float GetIdleAnimationSpeed()
+        {
+            var globalMultiplier = SettingsManager.Instance?.Settings.globalAnimationSpeedMultiplier ?? 1f;
+            var idleMultiplier = SettingsManager.Instance?.Settings.idleAnimationSpeedMultiplier ?? 1f;
+            return globalMultiplier * idleMultiplier * localAnimationSpeedMultiplier;
+        }
+
+        #endregion
+
+        #region Smart Animation Player
+
+        /// <summary>
+        /// Animation Event "TriggerHit"
+        /// </summary>
+        public void TriggerHit()
+        {
+            if (!hitTriggered)
+            {
+                hitTriggered = true;
+                activeHitCallback?.Invoke();
+                activeHitCallback = null;
+            }
+        }
+
+        /// <summary>
+        /// Универсальный метод атаки ближнего боя. 
+        /// </summary>
+        public IEnumerator PerformAttack(Vector3 targetPos, string triggerName, Action onHit,
+            bool forceProceduralPunch = false, bool useDiagonalPunch = false)
+        {
+            FlipToTarget(targetPos);
+
+            if (animator == null)
+            {
+                if (useDiagonalPunch)
+                    yield return StartCoroutine(DiagonalPunchAnimation(targetPos, onHit));
+                else
+                    yield return StartCoroutine(PunchAnimation(targetPos, onHit));
+                yield break;
+            }
+
+            bool hasAnimatorTrigger = HasParameter(triggerName);
+
+            if (hasAnimatorTrigger)
+            {
+                hitTriggered = false;
+                activeHitCallback = onHit;
+
+                animator.speed = GetAnimationSpeedMultiplier();
+                animator.SetTrigger(triggerName);
+
+                if (forceProceduralPunch)
+                {
+                    Coroutine punchCoroutine = null;
+                    if (useDiagonalPunch)
+                        punchCoroutine = StartCoroutine(DiagonalPunchAnimation(targetPos, null));
+                    else
+                        punchCoroutine = StartCoroutine(PunchAnimation(targetPos, null));
+
+                    var maxWaitTime = 2f / GetAnimationSpeedMultiplier();
+                    var elapsed = 0f;
+
+                    while (!hitTriggered && elapsed < maxWaitTime)
+                    {
+                        elapsed += Time.deltaTime;
+                        yield return null;
+                    }
+
+                    if (!hitTriggered)
+                    {
+                        Debug.LogWarning($"[Animation] На {name} не сработало TriggerHit для {triggerName}");
+                        TriggerHit();
+                    }
+
+                    if (punchCoroutine != null)
+                        yield return punchCoroutine;
+                }
+                else
+                {
+                    var maxWaitTime = 2f / GetAnimationSpeedMultiplier();
+                    var elapsed = 0f;
+
+                    while (!hitTriggered && elapsed < maxWaitTime)
+                    {
+                        elapsed += Time.deltaTime;
+                        yield return null;
+                    }
+
+                    if (!hitTriggered)
+                    {
+                        Debug.LogWarning($"[Animation] На {name} не сработало TriggerHit для {triggerName}");
+                        TriggerHit();
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning(
+                    $"[Animation] У {name} нет параметра '{triggerName}' в Animator. " +
+                    $"Используется программная атака."
+                );
+
+                if (useDiagonalPunch)
+                    yield return StartCoroutine(DiagonalPunchAnimation(targetPos, onHit));
+                else
+                    yield return StartCoroutine(PunchAnimation(targetPos, onHit));
+
+                yield break;
+            }
+
+            animator.speed = GetIdleAnimationSpeed();
+            yield return new WaitForSeconds(GetScaledTime(0.2f));
+        }
+
+        /// <summary>
+        /// Универсальный метод для выстрелов.
+        /// </summary>
+        public IEnumerator PerformCast(string triggerName, Action onCastTrigger)
+        {
+            if (animator != null && HasParameter(triggerName))
+            {
+                hitTriggered = false;
+                activeHitCallback = onCastTrigger;
+
+                animator.SetTrigger(triggerName);
+
+                var maxWaitTime = 2f / GetAnimationSpeedMultiplier();
+                var elapsed = 0f;
+
+                while (!hitTriggered && elapsed < maxWaitTime)
+                {
+                    elapsed += Time.deltaTime;
+                    yield return null;
+                }
+
+                if (!hitTriggered)
+                {
+                    TriggerHit();
+                }
+
+                yield return new WaitForSeconds(GetScaledTime(0.15f));
+            }
+            else
+            {
+                onCastTrigger?.Invoke();
+                yield return null;
+            }
         }
 
         #endregion
