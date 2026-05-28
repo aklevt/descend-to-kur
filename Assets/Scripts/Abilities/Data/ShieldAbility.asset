@@ -20,7 +20,7 @@ MonoBehaviour:
   effectColor: {r: 1, g: 0.8334515, b: 0, a: 0.9}
   forceProceduralPunch: 0
   useDiagonalPunch: 0
-  shieldDuration: 1
+  shieldDuration: 2
   shieldEffectPrefab: {fileID: 8805173322590566325, guid: c0cc44a0d0944f8478f997c58aac12c1, type: 3}
   effectDuration: 2.15
   freezeEnergyCost: 3
