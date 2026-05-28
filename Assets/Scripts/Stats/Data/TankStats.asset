@@ -17,4 +17,4 @@ MonoBehaviour:
   baseAttackDamage: 7
   preferredAttackRange: 1
   minimumRange: 0
-  detectionRadius: 3
+  detectionRadius: 100

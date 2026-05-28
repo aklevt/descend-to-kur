@@ -1,4 +1,5 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Abilities;
 using Entities;
 using UnityEngine;
@@ -161,7 +162,10 @@ namespace Core
             var ability = enemy.Abilities[0];
 
             var theoretical = ability.GetTheoreticalCellsFrom(enemy.CurrentCell, enemy);
-            var reachable = ability.GetTargetCellsFrom(enemy.CurrentCell, enemy);
+            var reachable = ability
+                .GetTargetCellsFrom(enemy.CurrentCell, enemy)
+                .SelectMany(x => ability.GetEffectCells(x, enemy))
+                .ToList();
 
             var reachableSet = new HashSet<Vector3Int>(reachable);
             var faded = new List<Vector3Int>();

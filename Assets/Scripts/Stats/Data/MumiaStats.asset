@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: MumiaStats
   m_EditorClassIdentifier: GameScripts::Stats.EntityStats
   maxHealth: 15
-  moveRange: 2
+  moveRange: 3
   baseAttackDamage: 5
   preferredAttackRange: 1
   minimumRange: 0
+  detectionRadius: 0

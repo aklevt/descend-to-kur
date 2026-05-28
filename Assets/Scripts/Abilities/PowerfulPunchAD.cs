@@ -1,5 +1,6 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Entities;
 using UnityEngine;
 
@@ -127,6 +128,18 @@ namespace Abilities
             }
     
             entity.MoveDirectly(cell2);
+        }
+
+        public override List<Vector3Int> GetTheoreticalCellsFrom(Vector3Int position, BaseEntity actor)
+        {
+            var dirs = new List<Vector3Int>()
+            {
+                Vector3Int.up,
+                Vector3Int.down,
+                Vector3Int.left,
+                Vector3Int.right,
+            };
+            return dirs.SelectMany(x => GetEffectCells(x, actor)).ToList(); 
         }
     }
 }
