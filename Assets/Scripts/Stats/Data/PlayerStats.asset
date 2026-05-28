@@ -12,9 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be96a50c7e9b97545a4ddd8f3efc0844, type: 3}
   m_Name: PlayerStats
   m_EditorClassIdentifier: Assembly-CSharp::Stats.PlayerStats
-  maxHealth: 20
-  moveRange: 3
-  moveSpeed: 3
+  maxHealth: 25
+  moveRange: 4
   baseAttackDamage: 5
-  maxEnergy: 10
-  maxStepsPerRound: 3
+  maxEnergy: 12
+  maxStepsPerRound: 4

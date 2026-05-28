@@ -13,9 +13,11 @@ MonoBehaviour:
   m_Name: PowerfulPunchAbility
   m_EditorClassIdentifier: GameScripts::Abilities.PowerfulPunchAD
   abilityName: "\u0422\u043E\u043B\u0447\u043E\u043A"
-  energyCost: 9
+  energyCost: 11
   bonusDamage: 5
   overrideBaseDamage: 1
   highlightColor: {r: 0.6862745, g: 0, b: 0, a: 1}
   effectColor: {r: 1, g: 0.2, b: 0.2, a: 0.9}
+  forceProceduralPunch: 0
+  useDiagonalPunch: 0
   freezePower: 1
