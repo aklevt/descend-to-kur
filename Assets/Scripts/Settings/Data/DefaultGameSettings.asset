@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6f61ca7182326f4494fd92f32eb0eaa, type: 3}
   m_Name: DefaultGameSettings
   m_EditorClassIdentifier: GameScripts::Settings.GameSettings
-  globalAnimationSpeedMultiplier: 3
+  globalAnimationSpeedMultiplier: 1
+  idleAnimationSpeedMultiplier: 1
   baseMoveSpeed: 3
   enemyTurnDelay: 0.1
   roundEndDelay: 0.1

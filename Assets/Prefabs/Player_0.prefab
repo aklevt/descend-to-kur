@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 9028990903933944739}
   - component: {fileID: 4236902223299793777}
   - component: {fileID: 1864648129573356524}
+  - component: {fileID: 4166854872435520747}
   m_Layer: 0
   m_Name: Player_0
   m_TagString: Player
@@ -126,6 +127,7 @@ MonoBehaviour:
     ShieldTurns: 0
     Energy: 10
     MaxEnergy: 10
+    FrozenEnergy: 0
     RemainingSteps: 3
     MaxStepsPerRound: 3
     PreferredAttackRange: 1
@@ -225,6 +227,28 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.45, y: 1.04}
   m_EdgeRadius: 0
+--- !u!95 &4166854872435520747
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 39971611221549213}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 2ba1e3037b24ec845947667b47d10761, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &2648582787605504025
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,13 +11,11 @@ namespace Abilities
     [CreateAssetMenu(fileName = "TankPunchAbility", menuName = "Abilities/TankPunch")]
     public class TankPunchAbilityData : AbilityData
     {
-        [Header("Knockback")]
-        [Tooltip("Максимальная дистанция отброса")]
-        [SerializeField] private int knockbackDistance = 2;
-        
-        [Header("Visual")]
-        [Tooltip("Задержка перед")]
-        [SerializeField] private float impactPause = 0.1f;
+        [Header("Knockback")] [Tooltip("Максимальная дистанция отброса")] [SerializeField]
+        private int knockbackDistance = 2;
+
+        [Header("Visual")] [Tooltip("Задержка перед")] [SerializeField]
+        private float impactPause = 0.1f;
 
         public override List<Vector3Int> GetTargetCellsFrom(Vector3Int origin, BaseEntity actor)
         {
@@ -51,32 +49,35 @@ namespace Abilities
 
             var targetEntity = targetObj.GetComponent<BaseEntity>();
             var targetHealth = targetObj.GetComponent<Health>();
-            
+
             if (targetEntity == null) yield break;
 
             var damage = GetCalculatedDamage(actor);
             var knockbackDir = targetCell - actor.CurrentCell;
 
             // Анимация удара
-            yield return actor.StartCoroutine(actor.PunchAnimation(
+            yield return actor.StartCoroutine(actor.PerformAttack(
                 targetObj.transform.position,
+                "TankPunch",
                 () =>
                 {
                     targetHealth?.TakeDamage(damage);
                     CameraFollow.Instance?.ShakeHeavy();
-                }
+                },
+                forceProceduralPunch
             ));
+
 
             yield return new WaitForSeconds(actor.GetScaledTime(impactPause));
 
             ApplyKnockback(targetEntity, knockbackDir);
-            
+
             while (targetEntity != null && targetEntity.IsMoving)
             {
                 yield return null;
             }
         }
-        
+
         private void ApplyKnockback(BaseEntity target, Vector3Int direction)
         {
             if (target == null) return;
@@ -86,18 +87,18 @@ namespace Abilities
             for (var i = 1; i <= knockbackDistance; i++)
             {
                 var checkCell = target.CurrentCell + direction * i;
-                
+
                 if (!GridManager.Instance.IsCellKnockbackable(checkCell))
                 {
                     break;
                 }
-        
+
                 if (GridManager.Instance.HasBlockingTileObject(checkCell))
                 {
                     finalCell = checkCell;
                     break;
                 }
-        
+
                 finalCell = checkCell;
             }
 
