@@ -5056,12 +5056,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelController
   roomPrefabs:
-  - {fileID: 1108904379850795440, guid: b391fa4fbaa4be246b0bb5bb987a6a38, type: 3}
-  - {fileID: 1108904379850795440, guid: 913be42bdf58b0c48bb3921964eebfe6, type: 3}
-  - {fileID: 1108904379850795440, guid: 9a60914d4265fa5419825f17122fe721, type: 3}
-  - {fileID: 1108904379850795440, guid: 9a60914d4265fa5419825f17122fe721, type: 3}
-  - {fileID: 1108904379850795440, guid: 61036dab59b280943bb7975d566dbf55, type: 3}
-  - {fileID: 1108904379850795440, guid: 3015d29c37eea864ba9eeebb225753d4, type: 3}
+  - {fileID: 1108904379850795440, guid: f86978306ea04f345a0495d126cdf4ce, type: 3}
+  - {fileID: 1108904379850795440, guid: 982b0b107ca257e4f804d168ad109d46, type: 3}
   playerPrefab: {fileID: 39971611221549213, guid: 971cd5dc1690caf44a0e43bf8e7c81b0, type: 3}
 --- !u!114 &1246193165
 MonoBehaviour:

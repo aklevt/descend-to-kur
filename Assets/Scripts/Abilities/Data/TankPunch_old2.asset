@@ -9,14 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2db69245ffc348969c1b2244ca9b19d5, type: 3}
-  m_Name: TankPunchAbility_old
-  m_EditorClassIdentifier: GameScripts::Abilities.TankPunchAbilityData
+  m_Script: {fileID: 11500000, guid: a8362784ed549554ba66117fd67cba01, type: 3}
+  m_Name: TankPunch_old2
+  m_EditorClassIdentifier: GameScripts::Abilities.PowerfulPunchAD
   abilityName: 
   energyCost: 0
   bonusDamage: 0
   overrideBaseDamage: 0
   highlightColor: {r: 1, g: 1, b: 1, a: 1}
   effectColor: {r: 1, g: 0.2, b: 0.2, a: 0.9}
-  knockbackDistance: 2
-  impactPause: 0.1
+  forceProceduralPunch: 0
+  useDiagonalPunch: 0
+  freezePower: 0

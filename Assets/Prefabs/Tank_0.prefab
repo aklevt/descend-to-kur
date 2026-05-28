@@ -156,7 +156,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameScripts::Entities.TankEnemy
   abilities:
-  - {fileID: 11400000, guid: 51674737ce952cc4aa2b90e4e6453066, type: 2}
+  - {fileID: 11400000, guid: 747955dec6ff0044cae7c64f6d226380, type: 2}
   baseStats: {fileID: 11400000, guid: 9b5168f93fb78e24ea988a0bae1cfaaf, type: 2}
   stats:
     isCustomized: 0
@@ -174,7 +174,7 @@ MonoBehaviour:
     PreferredAttackRange: 1
     MinimumRange: 0
     DetectionRadius: 100
-  localAnimationSpeedMultiplier: 1
+  localAnimationSpeedMultiplier: 3
   projectileSpawnOffset: {x: 0.3, y: 0.5}
   spriteRenderer: {fileID: 3162903598212271331}
   animator: {fileID: 0}

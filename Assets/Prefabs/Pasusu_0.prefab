@@ -440,14 +440,16 @@ MonoBehaviour:
     MoveRange: 2
     AttackDamage: 4
     Freeze: 0
+    ShieldTurns: 0
     Energy: 3
     MaxEnergy: 3
+    FrozenEnergy: 0
     RemainingSteps: 0
     MaxStepsPerRound: 3
     PreferredAttackRange: 3
     MinimumRange: 2
     DetectionRadius: 0
-  localAnimationSpeedMultiplier: 1
+  localAnimationSpeedMultiplier: 3
   projectileSpawnOffset: {x: 0.36, y: 0.9}
   spriteRenderer: {fileID: 1379945844017360337}
   animator: {fileID: 0}
