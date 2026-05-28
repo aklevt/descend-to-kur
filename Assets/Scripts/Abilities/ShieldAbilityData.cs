@@ -40,7 +40,7 @@ namespace Abilities
                 yield break;
             }
 
-            actor.Stats.ApplyShield(shieldDuration);
+            actor.Stats.SetShield(shieldDuration);
             actor.UpdateVisualStatus();
 
             yield return PlayShieldEffect(actor);

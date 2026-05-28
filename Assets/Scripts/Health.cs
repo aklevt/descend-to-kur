@@ -30,7 +30,7 @@ public class Health : MonoBehaviour
         {
             Debug.Log($"<color=yellow>[Health]</color> Урон {damage} поглощен щитом для {gameObject.name}");
             StartCoroutine(FlashGold());
-            entity.Stats.ShieldTurns = 0;
+            entity.Stats.HitShield();
             return;
         }
 
