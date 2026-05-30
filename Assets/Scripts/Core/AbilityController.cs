@@ -17,6 +17,10 @@ namespace Core
         #region Configuration
 
         [SerializeField] private AbilityBar abilityBar;
+        
+        [Header("Info Panel")]
+        [SerializeField] private AbilityInfoPanel abilityInfoPanel;
+        
         private AbilityValidator validator = new AbilityValidator();
         private List<Vector3Int> availableCells = new();
         private AbilityData selectedAbility;
@@ -80,6 +84,7 @@ namespace Core
             isInputBlocked = true;
             ClearSelection();
             abilityBar?.DeselectAllSlots();
+            abilityInfoPanel?.Hide();
         }
 
         /// <summary>
@@ -96,6 +101,7 @@ namespace Core
             isDead = true;
             selectedAbility = null;
             ClearSelection();
+            abilityInfoPanel?.Hide();
         }
 
         #endregion
@@ -128,8 +134,25 @@ namespace Core
         {
             if (selectedAbility == ability) return;
             selectedAbility = ability;
+            RefreshInfoPanel();
             RefreshAbilityOverlay();
             RequestHoverUpdate();
+        }
+        
+        /// <summary>
+        /// Обновить инфо-панель под текущую способность
+        /// </summary>
+        private void RefreshInfoPanel()
+        {
+            if (abilityInfoPanel == null) return;
+
+            if (selectedAbility == null || PlayerMovement.Instance == null)
+            {
+                abilityInfoPanel.Hide();
+                return;
+            }
+
+            abilityInfoPanel.Show(selectedAbility, PlayerMovement.Instance);
         }
 
         #endregion
@@ -233,6 +256,7 @@ namespace Core
 
             isExecuting = false;
             RefreshAbilityOverlay();
+            RefreshInfoPanel();
         }
         
         public void CancelExecution()
@@ -289,6 +313,7 @@ namespace Core
             {
                 ClearSelection();
                 abilityBar?.DeselectAllSlots();
+                abilityInfoPanel?.Hide();
                 return;
             }
 

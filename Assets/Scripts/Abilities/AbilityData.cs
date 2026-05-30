@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Entities;
 using UnityEngine;
@@ -12,6 +12,17 @@ namespace Abilities
     public abstract class AbilityData : ScriptableObject
     {
         public string abilityName;
+
+        [Header("Info Panel")]
+        [Tooltip("Минимальная дальность для отображения в UI. 0 = нет минимального радиуса")]
+        public int displayMinRange = 0;
+        
+        [Tooltip("Дальность способности для отображения в UI. -1 = авто")]
+        public int displayRange = -1;
+        
+        [Tooltip("Описание способности (коротко)")]
+        [TextArea(2, 2)]
+        public string description = "";
 
         [Header("Cost")] public int energyCost = 0;
 
@@ -37,6 +48,39 @@ namespace Abilities
         {
             if (overrideBaseDamage) return bonusDamage;
             return Mathf.Max(0, actor.Stats.AttackDamage + bonusDamage);
+        }
+        
+        /// <summary>
+        /// Возвращает отображаемый урон для UI
+        /// </summary>
+        public int GetDisplayDamage(BaseEntity actor)
+        {
+            return GetCalculatedDamage(actor);
+        }
+
+        /// <summary>
+        /// Возвращает отображаемую дальность для UI.
+        /// Если displayRange == -1, пытается посчитать автоматически.
+        /// </summary>
+        public int GetDisplayRange(BaseEntity actor)
+        {
+            if (displayRange >= 0) return displayRange;
+            return ComputeAutoRange(actor);
+        }
+        
+        protected virtual int ComputeAutoRange(BaseEntity actor)
+        {
+            var cells = GetTheoreticalCellsFrom(actor.CurrentCell, actor);
+            var maxRange = 0;
+            foreach (var cell in cells)
+            {
+                var dist = Mathf.Max(
+                    Mathf.Abs(cell.x - actor.CurrentCell.x),
+                    Mathf.Abs(cell.y - actor.CurrentCell.y)
+                );
+                if (dist > maxRange) maxRange = dist;
+            }
+            return maxRange;
         }
 
         /// <summary>

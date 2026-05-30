@@ -28,7 +28,7 @@ namespace Core
                 abilityBar?.TriggerWarningFlash(abilityIndex);
             }
             
-            ShowAbilityWarnings(ability, stats);
+            // ShowAbilityWarnings(ability, stats);
         }
 
         /// <summary>
@@ -36,9 +36,21 @@ namespace Core
         /// </summary>
         public bool CanUseAbilityOnTarget(AbilityData ability, Vector3Int targetCell, List<Vector3Int> availableCells)
         {
+            var stats = PlayerMovement.Instance?.Stats;
+
             if (!ability.CanUse(PlayerMovement.Instance))
             {
-                UIController.Instance?.ShowEnergyWarning();
+                if (ability is MoveAbilityData)
+                {
+                    if (stats != null && stats.RemainingSteps <= 0)
+                        UIController.Instance?.ShowStepsWarning();
+                    else
+                        UIController.Instance?.ShowEnergyWarning();
+                }
+                else
+                {
+                    UIController.Instance?.ShowEnergyWarning();
+                }
                 return false;
             }
 
