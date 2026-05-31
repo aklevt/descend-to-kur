@@ -351,10 +351,25 @@ namespace Core.Room
 
         private void CompleteRoom()
         {
+            if (isCleared) return;
             isCleared = true;
             Debug.Log($"<color=green>[RoomController]</color> Цели комнаты выполнены");
+    
+            StartCoroutine(CompleteRoomSequence());
+        }
+        
+        /// <summary>
+        /// Последовательность завершения комнаты: диалоги, событие победы
+        /// </summary>
+        private IEnumerator CompleteRoomSequence()
+        {
+            yield return TriggerDialoguesOfTypeSequential(DialogueTriggerType.OnRoomCleared);
+    
+            Debug.Log($"<color=green>[RoomController]</color> Диалоги завершены, переход к экрану победы");
+    
             OnRoomCleared?.Invoke();
         }
+
 
         #endregion
 
