@@ -31,18 +31,18 @@ namespace Core.Room
         {
             hasPlayed = false;
 
-            if (triggerType == DialogueTriggerType.OnRoomCleared && parentRoom != null)
-            {
-                parentRoom.OnRoomCleared += TriggerDialogue;
-            }
+            // if (triggerType == DialogueTriggerType.OnRoomCleared && parentRoom != null)
+            // {
+            //     parentRoom.OnRoomCleared += TriggerDialogue;
+            // }
         }
 
         public void Cleanup()
         {
-            if (parentRoom != null)
-            {
-                parentRoom.OnRoomCleared -= TriggerDialogue;
-            }
+            // if (parentRoom != null)
+            // {
+            //     parentRoom.OnRoomCleared -= TriggerDialogue;
+            // }
         }
 
         public void TriggerDialogue()
