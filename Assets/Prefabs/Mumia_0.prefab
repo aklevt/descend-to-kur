@@ -415,7 +415,7 @@ MonoBehaviour:
     isCustomized: 0
     Health: 15
     MaxHealth: 15
-    MoveRange: 2
+    MoveRange: 3
     AttackDamage: 5
     Freeze: 0
     ShieldTurns: 0
@@ -427,7 +427,7 @@ MonoBehaviour:
     PreferredAttackRange: 1
     MinimumRange: 0
     DetectionRadius: 0
-  localAnimationSpeedMultiplier: 1
+  localAnimationSpeedMultiplier: 3
   projectileSpawnOffset: {x: 0.3, y: 0.5}
   spriteRenderer: {fileID: 5927671120677486074}
   animator: {fileID: 0}

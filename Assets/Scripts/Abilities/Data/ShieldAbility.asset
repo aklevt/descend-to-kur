@@ -13,10 +13,7 @@ MonoBehaviour:
   m_Name: ShieldAbility
   m_EditorClassIdentifier: GameScripts::Abilities.ShieldAbilityData
   abilityName: "\u0429\u0438\u0442"
-  displayMinRange: 0
-  displayRange: -1
-  description: 
-  energyCost: 4
+  energyCost: 8
   bonusDamage: 0
   overrideBaseDamage: 0
   highlightColor: {r: 0, g: 1, b: 0.62315774, a: 1}
@@ -24,7 +21,7 @@ MonoBehaviour:
   forceProceduralPunch: 0
   useDiagonalPunch: 0
   limitOncePerTurn: 1
-  shieldDuration: 1
+  shieldDuration: 2
   shieldEffectPrefab: {fileID: 8805173322590566325, guid: c0cc44a0d0944f8478f997c58aac12c1, type: 3}
   effectDuration: 2.15
   freezeEnergyCost: 3

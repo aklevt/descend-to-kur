@@ -16,7 +16,7 @@ MonoBehaviour:
   displayMinRange: 0
   displayRange: -1
   description: 
-  energyCost: 4
+  energyCost: 3
   bonusDamage: 0
   overrideBaseDamage: 0
   highlightColor: {r: 0.6862745, g: 0, b: 0, a: 1}

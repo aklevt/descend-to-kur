@@ -1,4 +1,4 @@
-// --- FILE: Assets/Scripts/Abilities/QueenRangedAttackAbilityData.cs ---
+﻿// --- FILE: Assets/Scripts/Abilities/QueenRangedAttackAbilityData.cs ---
 
 using System.Collections;
 using System.Collections.Generic;

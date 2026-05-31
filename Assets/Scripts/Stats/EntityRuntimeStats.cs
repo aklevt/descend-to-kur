@@ -1,3 +1,4 @@
+﻿using System;
 using UnityEngine;
 
 namespace Stats
@@ -15,7 +16,7 @@ namespace Stats
         public int MoveRange;
         public int AttackDamage;
         public int Freeze;
-        public int ShieldTurns;
+        public int shieldStrength;
 
         [Header("Player Only")]
         public int Energy;
@@ -70,7 +71,7 @@ namespace Stats
         }
 
         public bool IsDead => Health <= 0;
-        
+
         /// <summary>
         /// Проверяет, находится ли цель в радиусе обнаружения (0 = бесконечный радиус)
         /// </summary>
@@ -83,12 +84,12 @@ namespace Stats
 
         public bool HasEnergyForAction(int cost) => Energy >= cost;
         public void SpendEnergy(int amount) => Energy = Mathf.Max(0, Energy - amount);
-        public void RestoreEnergy(int amount) 
+        public void RestoreEnergy(int amount)
         {
             var accessibleMax = MaxEnergy - FrozenEnergy;
             Energy = Mathf.Min(accessibleMax, Energy + amount);
         }
-        
+
         public void ResetSteps() => RemainingSteps = Mathf.Min(MaxStepsPerRound, Energy);
         public void ResetStepsTo(int maxSteps) => RemainingSteps = maxSteps;
         public bool CanMove(int distance) => RemainingSteps >= distance;
@@ -103,25 +104,30 @@ namespace Stats
         {
             Health = Mathf.Min(MaxHealth, Health + amount);
         }
-        
-        public bool HasActiveShield => ShieldTurns > 0;
-        
+
+        public bool HasActiveShield => shieldStrength > 0;
+
         public void ProcessShieldEffect()
-        {
-            if (ShieldTurns > 0)
+        {   
+            if (shieldStrength > 0)
             {
-                ShieldTurns--;
-                if (ShieldTurns == 0)
-                {
-                    Debug.Log($"Щит всё");
-                }
+                Debug.Log($"Щит всё");
             }
+            SetShield(0);
         }
-        
-        public void ApplyShield(int turns)
+
+        public void SetShield(int turns)
         {
-            ShieldTurns = Mathf.Max(ShieldTurns, turns);
-            Debug.Log($"Щит активирован на {ShieldTurns} ходов");
+            shieldStrength = turns;
+            if (shieldStrength > 0) 
+                Debug.Log($"Щит активирован на {shieldStrength} ходов");
         }
+
+        public void HitShield()
+        {
+            shieldStrength--;
+            Math.Max(0, shieldStrength);
+        }
+
     }
 }

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Entities;
 using UnityEngine;
@@ -54,7 +54,7 @@ namespace Abilities
             
             if (limitOncePerTurn) wasUsedThisTurn = true;
 
-            actor.Stats.ApplyShield(shieldDuration);
+            actor.Stats.SetShield(shieldDuration);
             actor.UpdateVisualStatus();
 
             yield return PlayShieldEffect(actor);
