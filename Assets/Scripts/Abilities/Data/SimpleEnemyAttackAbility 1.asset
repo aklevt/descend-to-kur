@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3c84873b5b404b20bb501d0d5f49ba52, type: 3}
-  m_Name: SimpleAttackAbility
+  m_Name: SimpleEnemyAttackAbility 1
   m_EditorClassIdentifier: GameScripts::Abilities.SimpleAttackAbilityData
   abilityName: "\u0411\u043B\u0438\u0436\u043D\u044F\u044F \u0430\u0442\u0430\u043A\u0430"
   displayMinRange: 0
@@ -21,6 +21,5 @@ MonoBehaviour:
   overrideBaseDamage: 0
   highlightColor: {r: 0.6862745, g: 0, b: 0, a: 1}
   effectColor: {r: 1, g: 0.2, b: 0.2, a: 0.9}
-  forceProceduralPunch: 0
-  useDiagonalPunch: 0
-  limitOncePerTurn: 0
+  forceProceduralPunch: 1
+  useDiagonalPunch: 1
