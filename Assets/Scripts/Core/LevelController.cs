@@ -15,7 +15,7 @@ namespace Core
     public class LevelController : MonoBehaviour
     {
         public static LevelController Instance { get; private set; }
-        
+
         public event Action<int, int> OnRoomChanged;
 
         [Header("Level Progression")] [SerializeField]
@@ -53,7 +53,7 @@ namespace Core
                 Debug.Log("<color=cyan>[LevelController]</color> Старт с комнаты 0");
                 currentRoomIndex = 0;
             }
-            
+
             if (roomPrefabs != null && roomPrefabs.Count > 0)
             {
                 LoadRoomByIndex(currentRoomIndex);
@@ -118,7 +118,7 @@ namespace Core
             currentRoom.Initialize();
 
             SpawnPlayer();
-            
+
             if (currentRoom != null && currentPlayer != null)
             {
                 currentRoom.LinkPlayerToRoom(currentPlayer);
@@ -135,7 +135,7 @@ namespace Core
 
             Debug.Log($"<color=green>[LevelController]</color> Комната {index + 1}/{roomPrefabs.Count} загружена");
             UIController.Instance?.UnsuppressPopups();
-            
+
             OnRoomChanged?.Invoke(index + 1, roomPrefabs.Count);
         }
 
@@ -164,13 +164,12 @@ namespace Core
             if (AbilityController.Instance != null)
             {
                 AbilityController.Instance.SelectAbilityByIndex(0);
-                
+
                 AbilityController.Instance.RefreshAbilityOverlay();
                 AbilityController.Instance.RefreshInfoPanel();
             }
 
             UIController.Instance?.UnsuppressPopups();
-            
         }
 
         /// <summary>
@@ -214,7 +213,11 @@ namespace Core
                 currentPlayer = PlayerMovement.Instance;
 
                 var health = currentPlayer.GetComponent<Health>();
-                health?.ResetDeathState();
+                if (health != null)
+                {
+                    health.StopAllCoroutines();
+                    health.ResetDeathState();
+                }
 
                 Debug.Log(
                     $"<color=green>[LevelController]</color> Используется существующий игрок: {currentPlayer.name}");

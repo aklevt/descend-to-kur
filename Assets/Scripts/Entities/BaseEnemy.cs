@@ -41,6 +41,9 @@ namespace Entities
         {
             if (Abilities.Count > 0)
             {
+                if (Abilities[0] is TankPunchAbilityData)
+                    return new TankEnemyAI();
+                
                 if (Abilities[0] is QueenRangedAttackAbilityData)
                     return new QueenRangedEnemyAI();
 

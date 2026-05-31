@@ -51,6 +51,8 @@ namespace Stats
             MoveRange = baseStats.moveRange;
             AttackDamage = baseStats.baseAttackDamage;
             Freeze = 0;
+            
+            ResetShield();
 
             // Статы игрока
             if (baseStats is PlayerStatsData playerData)
@@ -129,5 +131,9 @@ namespace Stats
             Math.Max(0, shieldStrength);
         }
 
+        public void ResetShield()
+        {
+            shieldStrength = 0;
+        }
     }
 }

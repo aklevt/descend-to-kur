@@ -184,6 +184,13 @@ namespace Entities
         public void FullRestore()
         {
             InitializeStats();
+            stats.ResetShield();
+            
+            if (stats != null)
+            {
+                stats.ResetShield();
+            }
+            
             UpdateVisualStatus();
             Debug.Log($"<color=green>[{name}]</color> Полное восстановление: HP={stats.Health}, Energy={stats.Energy}");
         }
@@ -698,7 +705,7 @@ namespace Entities
                 yield break;
             }
 
-            bool hasAnimatorTrigger = HasParameter(triggerName);
+            var hasAnimatorTrigger = HasParameter(triggerName);
 
             if (hasAnimatorTrigger)
             {

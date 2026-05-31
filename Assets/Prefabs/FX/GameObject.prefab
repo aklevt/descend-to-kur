@@ -82,7 +82,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 10
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 2389193319765324094, guid: 1511e3d6193ebc347a5bb080ba18e642, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -104,7 +104,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e117db7a22d63845a7529b03a741b2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: GameScripts::ShieldEffect
-  rotationSpeed: 90
-  pulseSpeed: 2
-  minAlpha: 0.3
-  maxAlpha: 0.8
+  globalScale: 1.2

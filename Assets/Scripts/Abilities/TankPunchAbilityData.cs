@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Abilities
 {
     /// <summary>
-    /// Бьёт на 1 клетку, наносит большой урон и отбрасывает цель.
+    /// Бьёт на 1-2 клетки по прямой или на 1 клетку по диагонали, наносит большой урон и отбрасывает цель.
     /// </summary>
     [CreateAssetMenu(fileName = "TankPunchAbility", menuName = "Abilities/TankPunch")]
     public class TankPunchAbilityData : AbilityData
@@ -15,14 +15,65 @@ namespace Abilities
         [Header("Knockback")] [Tooltip("Максимальная дистанция отброса")] [SerializeField]
         private int knockbackDistance = 2;
 
-        [Header("Visual")] [Tooltip("Задержка перед")] [SerializeField]
-        private float impactPause = 0.1f;
+        [Header("Visual")] [Tooltip("Задержка перед возвращением назад")] [SerializeField]
+        private float impactPause = 0.15f;
 
         public override List<Vector3Int> GetTargetCellsFrom(Vector3Int origin, BaseEntity actor)
         {
-            return GridManager.Instance.GetAttackableCellsInRadius(origin, 1)
+            var rawCells = GridManager.Instance.GetAttackableCellsInRadius(origin, 1)
                 .SelectMany(x => RadiusToEffectCells(x, actor))
                 .ToList();
+
+            var filteredCells = new List<Vector3Int>();
+
+            foreach (var cell in rawCells)
+            {
+                var dx = Mathf.Abs(cell.x - origin.x);
+                var dy = Mathf.Abs(cell.y - origin.y);
+
+                if (dx == 0 && dy == 0) continue;
+
+                var isStraightLine = (dx == 0 && dy <= 2) || (dy == 0 && dx <= 2);
+                var isDiagonalLine = (dx == 1 && dy == 1);
+
+                if (isStraightLine || isDiagonalLine)
+                {
+                    if (IsPathClear(origin, cell))
+                    {
+                        if (!filteredCells.Contains(cell))
+                        {
+                            filteredCells.Add(cell);
+                        }
+                    }
+                }
+            }
+
+            return filteredCells;
+        }
+
+        
+        private bool IsPathClear(Vector3Int origin, Vector3Int target)
+        {
+            var dx = target.x - origin.x;
+            var dy = target.y - origin.y;
+
+            var step = new Vector3Int(System.Math.Sign(dx), System.Math.Sign(dy), 0);
+            var current = origin;
+
+            while (current != target)
+            {
+                current += step;
+                
+                if (!GridManager.Instance.IsCellShootable(current))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override List<Vector3Int> GetTheoreticalCellsFrom(Vector3Int position, BaseEntity actor)
+        {
+            return GetTargetCellsFrom(position, actor);
         }
 
         public List<Vector3Int> RadiusToEffectCells(Vector3Int hoveredCell, BaseEntity actor)
@@ -86,7 +137,7 @@ namespace Abilities
             return target != null && target != caster.gameObject;
         }
 
-        public override IEnumerator Execute(BaseEntity actor, Vector3Int targetCell)
+public override IEnumerator Execute(BaseEntity actor, Vector3Int targetCell)
         {
             var targetObj = GridManager.Instance.GetEntityAt(targetCell);
             if (targetObj == null) yield break;
@@ -99,28 +150,86 @@ namespace Abilities
             var damage = GetCalculatedDamage(actor);
             var knockbackDir = targetCell - actor.CurrentCell;
 
-            // Анимация удара
-            yield return actor.StartCoroutine(actor.PerformAttack(
-                targetObj.transform.position,
-                "TankPunch",
-                () =>
+            var dx = Mathf.Abs(targetCell.x - actor.CurrentCell.x);
+            var dy = Mathf.Abs(targetCell.y - actor.CurrentCell.y);
+
+            var isDiagonal = (dx == 1 && dy == 1);
+            var isTwoCellsAway = (dx == 2 && dy == 0) || (dx == 0 && dy == 2);
+
+            var originalPosition = actor.transform.position;
+            var targetPosition = targetObj.transform.position;
+
+            if (isDiagonal || isTwoCellsAway)
+            {
+                
+                var dashPercentage = isTwoCellsAway ? 0.75f : 0.5f; 
+                var dashTargetPosition = Vector3.Lerp(originalPosition, targetPosition, dashPercentage);
+
+                
+                if (actor.HasParameter("TankPunch"))
                 {
-                    targetHealth?.TakeDamage(damage);
-                    CameraFollow.Instance?.ShakeHeavy();
-                    ApplyKnockback(targetEntity, knockbackDir);
-                },
-                forceProceduralPunch
-            ));
+                    actor.GetComponent<Animator>().SetTrigger("TankPunch");
+                }
+
+                
+                var elapsed = 0f;
+                var dashDuration = 0.15f; 
+                while (elapsed < dashDuration)
+                {
+                    elapsed += Time.deltaTime;
+                    actor.transform.position = Vector3.Lerp(originalPosition, dashTargetPosition, elapsed / dashDuration);
+                    
+                    
+                    actor.FlipToTarget(targetPosition);
+                    yield return null;
+                }
+                actor.transform.position = dashTargetPosition;
+                actor.FlipToTarget(targetPosition);
+
+                
+                targetHealth?.TakeDamage(damage);
+                CameraFollow.Instance?.ShakeHeavy();
+                ApplyKnockback(targetEntity, knockbackDir);
+
+                yield return new WaitForSeconds(impactPause);
+
+                
+                var elapsedReturn = 0f;
+                var returnDuration = 0.2f;
+                while (elapsedReturn < returnDuration)
+                {
+                    elapsedReturn += Time.deltaTime;
+                    actor.transform.position = Vector3.Lerp(dashTargetPosition, originalPosition, elapsedReturn / returnDuration);
+                    
+                    
+                    actor.FlipToTarget(targetPosition);
+                    yield return null;
+                }
+                actor.transform.position = originalPosition;
+                actor.FlipToTarget(targetPosition); 
+            }
+            else
+            {
+                
+                yield return actor.StartCoroutine(actor.PerformAttack(
+                    targetObj.transform.position,
+                    "TankPunch",
+                    () =>
+                    {
+                        targetHealth?.TakeDamage(damage);
+                        CameraFollow.Instance?.ShakeHeavy();
+                        ApplyKnockback(targetEntity, knockbackDir);
+                    },
+                    forceProceduralPunch
+                ));
+            }
 
             while (targetEntity != null && targetEntity.IsMoving)
             {
                 yield return null;
             }
-        }
-
-        private void ApplyKnockback(BaseEntity target, Vector3Int direction)
+        }        private void ApplyKnockback(BaseEntity target, Vector3Int direction)
         {
-
             if (target == null) return;
 
             var finalCell = target.CurrentCell;
@@ -130,9 +239,7 @@ namespace Abilities
                 var checkCell = target.CurrentCell + GetNearestDirection(direction) * i;
 
                 if (!GridManager.Instance.IsCellKnockbackable(checkCell))
-                {
                     break;
-                }
 
                 if (GridManager.Instance.HasBlockingTileObject(checkCell))
                 {
@@ -145,12 +252,11 @@ namespace Abilities
 
             if (finalCell != target.CurrentCell)
             {
-                Debug.Log($"[TankPunch] Отброс {target.gameObject.name}: {target.CurrentCell} -> {finalCell}");
-                target.MoveDirectly(finalCell, playWalkAnimation:false);
+                target.MoveDirectly(finalCell, playWalkAnimation: false);
             }
         }
 
-        /// <summary>
+       /// <summary>
         /// Возвращает ближайшее направление для заданного вектора.
         /// Если вектор одинаково близок к двум направлениям, возвращает их сумму.
         /// </summary>
@@ -179,7 +285,7 @@ namespace Abilities
             float maxCos = Mathf.Max(cosUp, cosDown, cosRight, cosLeft);
 
             // Находим направление, к которому ближе всего данный вектор
-            // Если 2 напралвения одинаково близко, берем диагональ
+            // Если 2 направления одинаково близко, берем диагональ
             Vector3Int result = Vector3Int.zero;
 
             if (Mathf.Approximately(cosUp, maxCos))
