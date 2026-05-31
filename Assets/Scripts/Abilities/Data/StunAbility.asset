@@ -28,7 +28,7 @@ MonoBehaviour:
   maxRange: 4
   stunDuration: 2
   chainProjectilePrefab: {fileID: 3004488144075951647, guid: 05c68ecd8d31633448a2fb7a776838c0, type: 3}
-  projectileSpeed: 2
-  arcHeight: 2
+  projectileSpeed: 3.5
+  arcHeight: 1.5
   stunEffectPrefab: {fileID: 0}
   effectDuration: 0.3

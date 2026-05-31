@@ -409,7 +409,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   abilities:
-  - {fileID: 11400000, guid: eccfb25f92df17f4695c1d1dc604246f, type: 2}
+  - {fileID: 11400000, guid: 5e61462fe6fde0c4bba208480a22a48c, type: 2}
   baseStats: {fileID: 11400000, guid: 7c30066f7a295724da5fbc75b53bd3fa, type: 2}
   stats:
     isCustomized: 0
@@ -418,7 +418,7 @@ MonoBehaviour:
     MoveRange: 3
     AttackDamage: 5
     Freeze: 0
-    ShieldTurns: 0
+    shieldStrength: 0
     Energy: 0
     MaxEnergy: 0
     FrozenEnergy: 0
