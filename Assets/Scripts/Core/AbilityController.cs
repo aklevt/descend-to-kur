@@ -253,7 +253,7 @@ namespace Core
                         }
 
                         var stats = player.Stats;
-                        int distance = Mathf.Abs(clickedCell.x - player.CurrentCell.x) +
+                        var distance = Mathf.Abs(clickedCell.x - player.CurrentCell.x) +
                                        Mathf.Abs(clickedCell.y - player.CurrentCell.y);
 
                         // Нехватка шагов

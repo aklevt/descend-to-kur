@@ -121,11 +121,11 @@ namespace Abilities
             {
                 var projectile = Instantiate(chainProjectilePrefab, startPos, Quaternion.identity);
 
-                float distance = Vector3.Distance(startPos, endPos);
-                float duration = distance / projectileSpeed;
-                float time = 0f;
-                Vector3 lastPos = startPos;
-                Vector3 originalScale = projectile.transform.localScale;
+                var distance = Vector3.Distance(startPos, endPos);
+                var duration = distance / projectileSpeed;
+                var time = 0f;
+                var lastPos = startPos;
+                var originalScale = projectile.transform.localScale;
 
                 // Полет цепи по дуге
                 while (time < duration)
@@ -133,16 +133,16 @@ namespace Abilities
                     if (projectile == null) break;
 
                     time += Time.deltaTime * actor.GetAnimationSpeedMultiplier();
-                    float linearProgress = time / duration;
+                    var linearProgress = time / duration;
 
-                    Vector3 currentPos = Vector3.Lerp(startPos, endPos, linearProgress);
-                    float arcOffset = Mathf.Sin(linearProgress * Mathf.PI) * arcHeight;
+                    var currentPos = Vector3.Lerp(startPos, endPos, linearProgress);
+                    var arcOffset = Mathf.Sin(linearProgress * Mathf.PI) * arcHeight;
                     currentPos.y += arcOffset;
 
-                    Vector3 direction = currentPos - lastPos;
+                    var direction = currentPos - lastPos;
                     if (direction != Vector3.zero)
                     {
-                        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                        var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
                         projectile.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
                     }
 
@@ -155,8 +155,8 @@ namespace Abilities
                 if (projectile != null)
                 {
                     projectile.transform.position = endPos;
-                    float hitTime = 0f;
-                    float hitDuration = 0.1f;
+                    var hitTime = 0f;
+                    var hitDuration = 0.1f;
 
                     var spriteRenderer = projectile.GetComponentInChildren<SpriteRenderer>();
 
@@ -164,13 +164,13 @@ namespace Abilities
                     {
                         if (projectile == null) break;
                         hitTime += Time.deltaTime;
-                        float p = hitTime / hitDuration;
+                        var p = hitTime / hitDuration;
 
                         projectile.transform.localScale = Vector3.Lerp(originalScale, originalScale * 2.5f, p);
 
                         if (spriteRenderer != null)
                         {
-                            Color c = spriteRenderer.color;
+                            var c = spriteRenderer.color;
                             c.a = Mathf.Lerp(1f, 0f, p);
                             spriteRenderer.color = c;
                         }

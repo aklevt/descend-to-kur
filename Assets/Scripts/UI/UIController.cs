@@ -106,12 +106,12 @@ namespace UI
         private IEnumerator ShowPopupFadeRoutine()
         {
             warningPopup.SetActive(true);
-            float elapsed = 0f;
+            var elapsed = 0f;
 
             while (elapsed < fadeDuration)
             {
                 elapsed += Time.deltaTime;
-                float progress = elapsed / fadeDuration;
+                var progress = elapsed / fadeDuration;
 
                 warningCanvasGroup.alpha = progress;
 
@@ -133,7 +133,7 @@ namespace UI
             while (elapsed < fadeDuration)
             {
                 elapsed += Time.deltaTime;
-                float progress = elapsed / fadeDuration;
+                var progress = elapsed / fadeDuration;
 
                 warningCanvasGroup.alpha = 1f - progress;
                 yield return null;

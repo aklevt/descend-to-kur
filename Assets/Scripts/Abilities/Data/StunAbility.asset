@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: StunAbility
   m_EditorClassIdentifier: GameScripts::Abilities.StunAbilityData
   abilityName: "\u041E\u0433\u043B\u0443\u0448\u0435\u043D\u0438\u0435"
-  displayMinRange: 1
+  displayMinRange: 2
   displayRange: -1
   description: 
   energyCost: 4

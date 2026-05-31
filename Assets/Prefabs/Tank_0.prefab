@@ -48,6 +48,7 @@ GameObject:
   - component: {fileID: 3162903598212271331}
   - component: {fileID: 3041835845030921329}
   - component: {fileID: 4383957398380013867}
+  - component: {fileID: 4873876843481571354}
   m_Layer: 0
   m_Name: Tank_0
   m_TagString: Untagged
@@ -120,7 +121,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 4326872430171513394, guid: 10849a49851739148942706e34d97135, type: 3}
+  m_Sprite: {fileID: 731835520666169571, guid: b29bd8453fa751f41b7c8040e37c404e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -165,7 +166,7 @@ MonoBehaviour:
     MoveRange: 1
     AttackDamage: 7
     Freeze: 0
-    ShieldTurns: 0
+    shieldStrength: 0
     Energy: 0
     MaxEnergy: 0
     FrozenEnergy: 0
@@ -181,6 +182,28 @@ MonoBehaviour:
   isGridInitialized: 0
   isStationary: 0
   returnToPost: 1
+--- !u!95 &4873876843481571354
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3198998588260412228}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 76ab3acf2b30673488c2647cc9d2714e, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &3271288754337739070
 GameObject:
   m_ObjectHideFlags: 0

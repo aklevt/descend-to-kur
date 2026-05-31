@@ -15,6 +15,6 @@ MonoBehaviour:
   maxHealth: 10
   moveRange: 2
   baseAttackDamage: 4
-  preferredAttackRange: 3
+  preferredAttackRange: 4
   minimumRange: 2
   detectionRadius: 0
