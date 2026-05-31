@@ -41,6 +41,18 @@ namespace Abilities
         [Tooltip("Использовать диагональную анимацию для вертикальных атак")]
         public bool useDiagonalPunch = false;
         
+        [Header("Turn Limits")]
+        [Tooltip("Можно ли использовать эту способность только один раз за ход?")]
+        public bool limitOncePerTurn = false;
+
+        /// <summary>
+        /// Проверяет кастомные ограничения (лимит на использование за ход).
+        /// </summary>
+        public virtual bool IsTurnLimitExceeded()
+        {
+            return false;
+        }
+        
         /// <summary>
         /// Рассчитывает итоговый урон на основе статов атакующего
         /// </summary>

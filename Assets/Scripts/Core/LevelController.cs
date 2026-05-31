@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Core.Room;
@@ -14,6 +15,8 @@ namespace Core
     public class LevelController : MonoBehaviour
     {
         public static LevelController Instance { get; private set; }
+        
+        public event Action<int, int> OnRoomChanged;
 
         [Header("Level Progression")] [SerializeField]
         private List<GameObject> roomPrefabs;
@@ -132,6 +135,8 @@ namespace Core
 
             Debug.Log($"<color=green>[LevelController]</color> Комната {index + 1}/{roomPrefabs.Count} загружена");
             UIController.Instance?.UnsuppressPopups();
+            
+            OnRoomChanged?.Invoke(index + 1, roomPrefabs.Count);
         }
 
         private IEnumerator BeginLevelNextFrame()
@@ -159,9 +164,13 @@ namespace Core
             if (AbilityController.Instance != null)
             {
                 AbilityController.Instance.SelectAbilityByIndex(0);
+                
+                AbilityController.Instance.RefreshAbilityOverlay();
+                AbilityController.Instance.RefreshInfoPanel();
             }
 
             UIController.Instance?.UnsuppressPopups();
+            
         }
 
         /// <summary>

@@ -17,18 +17,20 @@ namespace Core
         #region Configuration
 
         [SerializeField] private AbilityBar abilityBar;
-        
-        [Header("Info Panel")]
-        [SerializeField] private AbilityInfoPanel abilityInfoPanel;
-        
+
+        [Header("Info Panel")] [SerializeField]
+        private AbilityInfoPanel abilityInfoPanel;
+
         private AbilityValidator validator = new AbilityValidator();
         private List<Vector3Int> availableCells = new();
         private AbilityData selectedAbility;
         private bool isExecuting;
+        public bool IsExecuting => isExecuting;
+
         private bool isDead;
         private bool isInputBlocked;
         private bool needsHoverUpdate;
-        
+
         public AbilityData SelectedAbility => selectedAbility;
 
         public List<Vector3Int> AvailableCells => availableCells;
@@ -138,11 +140,11 @@ namespace Core
             RefreshAbilityOverlay();
             RequestHoverUpdate();
         }
-        
+
         /// <summary>
         /// Обновить инфо-панель под текущую способность
         /// </summary>
-        private void RefreshInfoPanel()
+        public void RefreshInfoPanel()
         {
             if (abilityInfoPanel == null) return;
 
@@ -165,9 +167,171 @@ namespace Core
 
             if (!ValidatePlayerStateForAction()) return;
 
-            if (!ValidateAbilityUsage(clickedCell)) return;
+            var player1 = PlayerMovement.Instance;
+            if (player1 == null) return;
+            
+            if (RoomController.Current != null)
+            {
+                var roomCheck = RoomController.Current.ValidateActionInRoom(clickedCell, selectedAbility);
+                if (!roomCheck.Success)
+                {
+                    UIController.Instance?.ShowWarning(roomCheck.ErrorMessage);
+                    return;
+                }
+            }
 
-            StartCoroutine(ExecuteSelectedAbility(clickedCell));
+            // Доступная клетка
+            if (availableCells.Contains(clickedCell))
+            {
+                if (selectedAbility is not MoveAbilityData)
+                {
+                    if (!selectedAbility.IsValidTarget(clickedCell, player1))
+                    {
+                        UIController.Instance?.ShowWarning("Нет цели!",
+                            "В области действия способности нет подходящей цели для атаки.");
+                        return;
+                    }
+                }
+
+                if (!ValidateAbilityUsage(clickedCell)) return;
+                StartCoroutine(ExecuteSelectedAbility(clickedCell));
+                return;
+            }
+
+            // Проверка нажатия на себя
+            if (selectedAbility is not MoveAbilityData && clickedCell != player1.CurrentCell)
+            {
+                var theoreticalCells = selectedAbility.GetTheoreticalCellsFrom(player1.CurrentCell, player1);
+
+                if ((theoreticalCells.Count == 1 || selectedAbility is ShieldAbilityData) &&
+                    theoreticalCells.Contains(player1.CurrentCell))
+                {
+                    UIController.Instance?.ShowWarning("Неверная цель!",
+                        "Способность можно применить только на себя.");
+                    return;
+                }
+            }
+
+            // Клик по игроку
+            if (clickedCell == player1.CurrentCell)
+            {
+                if (selectedAbility is MoveAbilityData)
+                {
+                    UIController.Instance?.ShowWarning("Вы уже здесь!", "Вы стоите на этой клетке");
+                }
+                else
+                {
+                    UIController.Instance?.ShowWarning("Неверная цель!",
+                        "Вы не можете применить эту способность на себя");
+                }
+
+                return;
+            }
+
+            // Внутри теоретического радиуса
+            if (selectedAbility != null && PlayerMovement.Instance != null)
+            {
+                var player = PlayerMovement.Instance;
+                var theoretical = selectedAbility.GetTheoreticalCellsFrom(player.CurrentCell, player);
+
+                if (theoretical.Contains(clickedCell))
+                {
+                    // Режим перемещения
+                    if (selectedAbility is MoveAbilityData)
+                    {
+                        // Клик в монстра
+                        if (GridManager.Instance != null && GridManager.Instance.GetEntityAt(clickedCell) != null)
+                            return;
+
+                        // Проверка стен
+                        if (GridManager.Instance != null &&
+                            !GridManager.Instance.IsCellWalkable(clickedCell, player.gameObject))
+                        {
+                            UIController.Instance?.ShowWarning("Проход заблокирован!",
+                                "Через эту клетку нельзя пройти");
+                            return;
+                        }
+
+                        var stats = player.Stats;
+                        int distance = Mathf.Abs(clickedCell.x - player.CurrentCell.x) +
+                                       Mathf.Abs(clickedCell.y - player.CurrentCell.y);
+
+                        // Нехватка шагов
+                        if (distance > stats.RemainingSteps)
+                        {
+                            if (stats.RemainingSteps <= 0)
+                            {
+                                UIController.Instance?.ShowWarning("Доступные шаги закончились!",
+                                    "Вы исчерпали лимит перемещений на этот ход");
+                            }
+                            else
+                            {
+                                UIController.Instance?.ShowWarning("Слишком далеко!",
+                                    "Вам не хватает шагов, чтобы добраться до этой клетки");
+                            }
+                        }
+                        // Нехватка энергии
+                        else if (distance > stats.Energy)
+                        {
+                            UIController.Instance?.ShowWarning("Недостаточно энергии!",
+                                "Не хватает энергии для перемещения на такое расстояние");
+                        }
+                    }
+                    // Режим способности
+                    else
+                    {
+                        // Лимит использования
+                        if (selectedAbility.IsTurnLimitExceeded())
+                        {
+                            UIController.Instance?.ShowWarning("Лимит исчерпан!",
+                                $"Способность '{selectedAbility.abilityName}' можно использовать только один раз за ход");
+                            return;
+                        }
+
+                        // Проверка цели
+                        if (!selectedAbility.IsValidTarget(clickedCell, player))
+                        {
+                            if (selectedAbility is StunAbilityData && GridManager.Instance != null)
+                            {
+                                var entity = GridManager.Instance.GetEntityAt(clickedCell);
+                                if (entity != null && entity != player.gameObject)
+                                {
+                                    UIController.Instance?.ShowWarning("Уже оглушен!",
+                                        "Этого монстра нельзя оглушить повторно на этом ходу");
+                                    return;
+                                }
+                            }
+
+                            UIController.Instance?.ShowWarning("Нет цели!",
+                                "В области действия способности нет подходящей цели для атаки");
+                        }
+                        // Нехватка энергии
+                        else
+                        {
+                            UIController.Instance?.ShowWarning("Недостаточно энергии!",
+                                "Способность достает до этой клетки, но у вас не хватает энергии на её применение");
+                        }
+                    }
+
+                    return;
+                }
+            }
+
+            // Клик в монстра вне радиуса
+            if (GridManager.Instance != null && GridManager.Instance.GetEntityAt(clickedCell) != null)
+            {
+                return;
+            }
+
+            // Вне радиуса
+            if (selectedAbility is MoveAbilityData)
+            {
+                UIController.Instance?.ShowWarning("Клетка недоступна!", "До этой клетки нельзя добраться за один ход");
+            }
+            else
+            {
+                UIController.Instance?.ShowWarning("Слишком далеко!", $"Эта клетка находится вне радиуса действия способности");
+            }
         }
 
         /// <summary>
@@ -191,16 +355,16 @@ namespace Core
         /// </summary>
         private bool ValidateAbilityUsage(Vector3Int targetCell)
         {
-            if (RoomController.Current != null)
-            {
-                var roomCheck = RoomController.Current.ValidateActionInRoom(targetCell, selectedAbility);
-        
-                if (!roomCheck.Success)
-                {
-                    UIController.Instance?.ShowWarning(roomCheck.ErrorMessage);
-                    return false;
-                }
-            }
+            // if (RoomController.Current != null)
+            // {
+            //     var roomCheck = RoomController.Current.ValidateActionInRoom(targetCell, selectedAbility);
+            //
+            //     if (!roomCheck.Success)
+            //     {
+            //         UIController.Instance?.ShowWarning(roomCheck.ErrorMessage);
+            //         return false;
+            //     }
+            // }
 
             return validator.CanUseAbilityOnTarget(selectedAbility, targetCell, availableCells);
         }
@@ -218,7 +382,7 @@ namespace Core
             var effectCells = selectedAbility.GetEffectCells(hoveredCell, PlayerMovement.Instance);
             GridHighlighter.Instance.HighlightEffect(effectCells, selectedAbility.effectColor);
         }
-        
+
         /// <summary>
         /// Запросить обновление подсветки эффекта
         /// </summary>
@@ -258,7 +422,7 @@ namespace Core
             RefreshAbilityOverlay();
             RefreshInfoPanel();
         }
-        
+
         public void CancelExecution()
         {
             StopAllCoroutines();
@@ -283,7 +447,8 @@ namespace Core
             var reachableSet = new HashSet<Vector3Int>(availableCells);
             var faded = new List<Vector3Int>();
             foreach (var c in theoretical)
-                if (!reachableSet.Contains(c)) faded.Add(c);
+                if (!reachableSet.Contains(c))
+                    faded.Add(c);
 
             GridHighlighter.Instance.HighlightCellsTwoLayers(
                 faded,
@@ -318,6 +483,15 @@ namespace Core
             }
 
             var abilities = PlayerAbilities;
+            if (abilities != null)
+            {
+                foreach (var ability in abilities)
+                {
+                    if (ability is ShieldAbilityData shield) shield.ResetTurnLimit();
+                    if (ability is StunAbilityData stun) stun.ResetTurnLimit();
+                }
+            }
+
             if (abilities != null && abilities.Count > 0)
                 SelectAbilityByIndex(0);
             else

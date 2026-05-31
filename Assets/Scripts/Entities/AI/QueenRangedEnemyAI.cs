@@ -95,8 +95,9 @@ namespace Entities.AI
                 if (!GridManager.Instance.IsCellShootable(current))
                     return false;
 
-                if (GridManager.Instance.GetEntityAt(current) != null)
-                    return false;
+                // Может стрелять
+                // if (GridManager.Instance.GetEntityAt(current) != null)
+                //     return false;
 
                 current += new Vector3Int(stepX, stepY, 0);
             }

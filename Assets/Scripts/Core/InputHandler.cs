@@ -1,3 +1,4 @@
+using Entities;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -220,6 +221,16 @@ namespace Core
         /// </summary>
         private void HandleAltToggle()
         {
+            if (!CanShowPreview())
+            {
+                if (lastAltState)
+                {
+                    lastAltState = false;
+                    EnemyPreviewSystem.Instance?.RefreshPreview(false);
+                }
+                return;
+            }
+            
             var kb = Keyboard.current;
             if (kb == null) return;
 
@@ -237,6 +248,17 @@ namespace Core
         /// </summary>
         private void UpdateEnemyPreview()
         {
+            if (!CanShowPreview())
+            {
+                if (previewShown)
+                {
+                    EnemyPreviewSystem.Instance?.HidePreview();
+                    previewShown = false;
+                }
+                previewHoverTimer = 0f;
+                return;
+            }
+            
             if (Mouse.current == null) return;
 
             var mousePos = Mouse.current.position.ReadValue();
@@ -282,11 +304,21 @@ namespace Core
                 previewHoverTimer = 0f;
             }
         }
+        
+        private bool CanShowPreview()
+        {
+            if (!IsPlayerTurn()) return false;
+
+            if (PlayerMovement.Instance != null && PlayerMovement.Instance.IsMoving) return false;
+            
+            if (AbilityController.Instance != null && AbilityController.Instance.IsExecuting) return false;
+
+            return true;
+        }
 
         /// <summary>
         /// Показывает превью зоны врага при наведении
         /// </summary>
-        
         private Vector2 GetCameraMovementInput()
         {
             var kb = Keyboard.current;

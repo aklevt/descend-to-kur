@@ -20,14 +20,14 @@ namespace Core
             if (PlayerMovement.Instance == null) return;
             if (GameStateManager.Instance?.CurrentState != GameState.Gameplay) return;
             if (TurnManager.Instance?.CurrentState != TurnState.PlayerTurn) return;
-            
+
             var stats = PlayerMovement.Instance.Stats;
-            
+
             if (ShouldFlashAbility(ability, stats))
             {
                 abilityBar?.TriggerWarningFlash(abilityIndex);
             }
-            
+
             // ShowAbilityWarnings(ability, stats);
         }
 
@@ -49,8 +49,17 @@ namespace Core
                 }
                 else
                 {
-                    UIController.Instance?.ShowEnergyWarning();
+                    if (ability.IsTurnLimitExceeded())
+                    {
+                        UIController.Instance?.ShowWarning("Игрок уже под эффектом щита",
+                            $"Способность '{ability.abilityName}' можно использовать только один раз за ход");
+                    }
+                    else
+                    {
+                        UIController.Instance?.ShowEnergyWarning();
+                    }
                 }
+
                 return false;
             }
 
@@ -58,7 +67,7 @@ namespace Core
 
             if (!ability.IsValidTarget(targetCell, PlayerMovement.Instance))
                 return false;
-                
+
             return true;
         }
 
@@ -72,7 +81,7 @@ namespace Core
                 UnityEngine.Debug.Log("Игрок заморожен, пропуск хода");
                 return false;
             }
-            
+
             return !PlayerMovement.Instance.IsMoving;
         }
 
@@ -93,12 +102,12 @@ namespace Core
             if (GameStateManager.Instance?.CurrentState != GameState.Gameplay) return;
             if (TurnManager.Instance?.CurrentState != TurnState.PlayerTurn)
                 return;
-            
+
             if (ability is MoveAbilityData && stats.RemainingSteps <= 0)
             {
                 UIController.Instance?.ShowStepsWarning();
             }
-            
+
             if (!ability.CanUse(PlayerMovement.Instance))
             {
                 UIController.Instance?.ShowEnergyWarning();
