@@ -67,6 +67,8 @@ namespace Abilities
         /// </summary>
         public int GetDisplayDamage(BaseEntity actor)
         {
+            if (overrideBaseDamage && bonusDamage == 0)
+                return 0;
             return GetCalculatedDamage(actor);
         }
 

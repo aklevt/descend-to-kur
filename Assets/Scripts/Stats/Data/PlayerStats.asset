@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be96a50c7e9b97545a4ddd8f3efc0844, type: 3}
   m_Name: PlayerStats
   m_EditorClassIdentifier: Assembly-CSharp::Stats.PlayerStats
+  entityName: "\u0418\u0433\u0440\u043E\u043A"
   maxHealth: 25
   moveRange: 4
   baseAttackDamage: 5

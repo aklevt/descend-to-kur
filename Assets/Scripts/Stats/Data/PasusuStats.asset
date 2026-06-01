@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f35bc3a3345e9614e81a1e7e5bb3b60a, type: 3}
   m_Name: PasusuStats
   m_EditorClassIdentifier: GameScripts::Stats.EntityStats
+  entityName: Pasusu
   maxHealth: 10
   moveRange: 2
   baseAttackDamage: 4

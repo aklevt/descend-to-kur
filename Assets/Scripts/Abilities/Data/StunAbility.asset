@@ -18,7 +18,7 @@ MonoBehaviour:
   description: 
   energyCost: 4
   bonusDamage: 0
-  overrideBaseDamage: 0
+  overrideBaseDamage: 1
   highlightColor: {r: 1, g: 0, b: 0.6606407, a: 1}
   effectColor: {r: 0.6348882, g: 0, b: 1, a: 0.9}
   forceProceduralPunch: 0
