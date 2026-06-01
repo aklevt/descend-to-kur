@@ -101,8 +101,15 @@ namespace Abilities
 
         private void KnobackEnemy(Vector3Int direction, BaseEntity entity)
         {
-            var cell1 = entity.CurrentCell + direction;
-            var cell2 = entity.CurrentCell + 2 * direction;
+            var normalizedDir = new Vector3Int(
+                System.Math.Sign(direction.x),
+                System.Math.Sign(direction.y),
+                0
+            );
+
+            
+            var cell1 = entity.CurrentCell + normalizedDir;
+            var cell2 = entity.CurrentCell + 2 * normalizedDir;
     
             if (!GridManager.Instance.IsCellKnockbackable(cell1))
             {

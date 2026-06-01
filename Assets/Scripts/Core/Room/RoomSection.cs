@@ -6,25 +6,29 @@ namespace Core.Room
 {
     public class RoomSection : MonoBehaviour
     {
-        [Header("Boundaries")] // 
+        [Header("Boundaries")]
         [Tooltip("Левая граница")]
         public Transform leftBoundary;
 
-        [Tooltip("Правая граница")] //
+        [Tooltip("Правая граница")]
         public Transform rightBoundary;
 
-        [Tooltip(
-            "Смещение левой границы камеры в клетках (положительное значение => камера может заходить левее границы)")]
+        [Tooltip("Смещение левой границы камеры в клетках (положительное значение => камера может заходить левее границы)")]
         [SerializeField]
         private float leftCameraOffset = 3f;
 
-        [Tooltip(
-            "Смещение правой границы камеры в клетках (положительное значение => камера может заходить правее границы)")]
+        [Tooltip("Смещение правой границы камеры в клетках (положительное значение => камера может заходить правее границы)")]
         [SerializeField]
         private float rightCameraOffset = 3f;
 
+        [Header("Auto-complete Settings")]
+        [Tooltip("Автоматически завершать уровень при входе в эту секцию, если в ней нет врагов")]
+        [SerializeField] 
+        private bool autoCompleteIfEmpty = false;
+
         public float LeftCameraOffset => leftCameraOffset;
         public float RightCameraOffset => rightCameraOffset;
+        public bool AutoCompleteIfEmpty => autoCompleteIfEmpty;
 
         public float LeftX => leftBoundary != null ? leftBoundary.position.x : transform.position.x;
         public float RightX => rightBoundary != null ? rightBoundary.position.x : transform.position.x;
@@ -48,12 +52,23 @@ namespace Core.Room
             IsActive = false;
             IsCleared = false;
             SetEnemiesActive(false);
+            
+            if (enemies.Count == 0 && autoCompleteIfEmpty)
+            {
+                IsCleared = true;
+                Debug.Log($"<color=cyan>[RoomSection]</color> Секция {SectionIndex} изначально пуста и автоматом завершается");
+            }
         }
 
         public void SetActive(bool active)
         {
             IsActive = active;
             SetEnemiesActive(active);
+
+            if (active)
+            {
+                CheckCleared();
+            }
         }
 
         private void SetEnemiesActive(bool active)
@@ -66,9 +81,20 @@ namespace Core.Room
         public void CheckCleared()
         {
             if (IsCleared) return;
-            // Проверка, есть ли кто живой физически
-            IsCleared = enemies.Count > 0 &&
-                        enemies.TrueForAll(e => e == null || !e.gameObject.activeSelf || e.IsPhysicallyDead());
+            
+            if (enemies.Count == 0)
+            {
+                if (autoCompleteIfEmpty || IsActive)
+                {
+                    IsCleared = true;
+                    Debug.Log($"<color=cyan>[RoomSection]</color> Секция {SectionIndex} пуста и завершается");
+                }
+                return;
+            }
+            
+            if (!IsActive) return;
+
+            IsCleared = enemies.TrueForAll(e => e == null || e.IsPhysicallyDead());
         }
 
         public bool ContainsEnemy(EnemyBase enemy) => enemies.Contains(enemy);
