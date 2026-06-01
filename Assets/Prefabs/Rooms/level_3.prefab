@@ -50,6 +50,7 @@ MonoBehaviour:
   rightBoundary: {fileID: 8699367357185038091}
   leftCameraOffset: 3
   rightCameraOffset: 3
+  autoCompleteIfEmpty: 0
 --- !u!1 &505675599104617721
 GameObject:
   m_ObjectHideFlags: 0
@@ -260,6 +261,7 @@ MonoBehaviour:
   rightBoundary: {fileID: 918165268811855006}
   leftCameraOffset: 3
   rightCameraOffset: 3
+  autoCompleteIfEmpty: 0
 --- !u!1 &4363893823993196959
 GameObject:
   m_ObjectHideFlags: 0

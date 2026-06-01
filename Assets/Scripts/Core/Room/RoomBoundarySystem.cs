@@ -1,5 +1,6 @@
 using System;
 using Abilities;
+using Core.Tutorial;
 using UnityEngine;
 
 namespace Core.Room
@@ -24,6 +25,24 @@ namespace Core.Room
         {
             if (sectionManager == null || GridManager.Instance == null)
                 return ValidationResult.Ok();
+            
+            // if (TutorialManager.Instance != null && TutorialManager.Instance.IsTutorialActive)
+            // {
+            //     var step = TutorialManager.Instance.CurrentStep;
+            //     
+            //     if (step.requiredAction == TutorialActionType.SelectAbility)
+            //     {
+            //         return ValidationResult.Fail("Сейчас активен режим обучения! Сначала выберите указанную способность на панели");
+            //     }
+            //     
+            //     if (step.requiredAction == TutorialActionType.ClickCell)
+            //     {
+            //         if (cell.x != step.targetCell.x || cell.y != step.targetCell.y)
+            //         {
+            //             return ValidationResult.Fail("Сейчас активен режим обучения! Кликните на подсвеченную клетку");
+            //         }
+            //     }
+            // }
 
             var worldPos = GridManager.Instance.GetCellCenterWorld(cell);
             var isCleared = sectionManager.IsCurrentSectionCleared();

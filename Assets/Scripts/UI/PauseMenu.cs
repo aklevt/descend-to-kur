@@ -28,7 +28,7 @@ namespace UI
 
             if (mainMenuButton != null)
                 mainMenuButton.onClick.AddListener(OnMainMenuClicked);
-            
+
             SetupAudio();
             // Hide();
         }
@@ -70,6 +70,11 @@ namespace UI
             SceneManager.LoadScene(mainMenuSceneName);
         }
 
+        public void TogglePause()
+        {
+            UIManager.Instance?.TogglePause();
+        }
+
 
         //         private void OnMainMenuClicked()
         //         {
@@ -82,17 +87,17 @@ namespace UI
         //         }
 
         #region Audio
-        
+
         private void SetupAudio()
         {
             if (volumeSlider != null)
             {
                 volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
-                
+
                 LoadAudioSettings();
             }
         }
-        
+
         /// <summary>
         /// Загрузка сохраненных настроек звука
         /// </summary>
@@ -101,11 +106,11 @@ namespace UI
             if (volumeSlider == null) return;
 
             var savedVolume = PlayerPrefs.GetFloat("MasterVolume", 1f);
-            
+
             volumeSlider.SetValueWithoutNotify(savedVolume);
-            
+
             AudioListener.volume = savedVolume;
-            
+
             UpdateVolumeText();
         }
 

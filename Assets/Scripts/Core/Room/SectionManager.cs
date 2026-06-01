@@ -196,18 +196,36 @@ namespace Core.Room
         /// </summary>
         private void ActivateSection(int index)
         {
-            sections[index].SetActive(true);
-            
-            if (TurnManager.Instance != null)
+            var section = sections[index];
+            section.SetActive(true);
+            section.CheckCleared();
+    
+            if (index > 0 && section.IsCleared && section.AutoCompleteIfEmpty)
+            {
+                Debug.Log("<color=yellow>[SectionManager]</color> Переход в пустую секцию с автозавершением уровня");
+        
+                var roomController = GetComponentInParent<RoomController>();
+                if (roomController != null)
+                {
+                    roomController.ForceComplete();
+                }
+                return;
+            }
+    
+            if (!section.IsCleared && TurnManager.Instance != null)
             {
                 TurnManager.Instance.BeginLevel();
                 Debug.Log("<color=lime>[SectionManager]</color> Ход игрока перезапущен через BeginLevel");
             }
-            
+            else if (section.IsCleared)
+            {
+                Debug.Log("<color=yellow>[SectionManager]</color> Секция пуста - свободное перемещение активно");
+            }
+    
             NotifyBoundsChanged();
             OnSectionEntered?.Invoke(index);
 
-            Debug.Log($"<color=green>[SectionManager]</color> Секция {index} активирована");
+            Debug.Log($"<color=green>[SectionManager]</color> Секция {index} активирована (Врагов: {section.Enemies.Count}, Зачищена: {section.IsCleared})");
         }
 
         /// <summary>

@@ -113,6 +113,19 @@ namespace Core
         public void SelectAbilityByIndex(int index)
         {
             if (LevelController.Instance != null && !LevelController.Instance.IsLevelLoaded) return;
+            
+            // if (TutorialManager.Instance != null && TutorialManager.Instance.IsTutorialActive)
+            // {
+            //     var step = TutorialManager.Instance.CurrentStep;
+            //     if (step.requiredAction == TutorialActionType.SelectAbility)
+            //     {
+            //         if (index != step.targetIndex)
+            //         {
+            //             UIController.Instance?.ShowWarning("Не та способность!", "Выберите способность, указанную в обучении.");
+            //             return; 
+            //         }
+            //     }
+            // }
 
             var abilities = PlayerAbilities;
             if (abilities == null || index >= abilities.Count)
@@ -125,6 +138,15 @@ namespace Core
             abilityBar?.OnAbilitySelected(index);
             SelectAbility(abilities[index]);
             RefreshAbilityOverlay();
+            
+            // if (TutorialManager.Instance != null && TutorialManager.Instance.IsTutorialActive)
+            // {
+            //     var step = TutorialManager.Instance.CurrentStep;
+            //     if (step.requiredAction == TutorialActionType.SelectAbility && index == step.targetIndex)
+            //     {
+            //         TutorialManager.Instance.NotifyActionCompleted(TutorialActionType.SelectAbility);
+            //     }
+            // }
         }
 
         private void CheckAbilityResourcesAndWarn(AbilityData targetAbility, int index)
@@ -215,6 +237,15 @@ namespace Core
             // Клик по игроку
             if (clickedCell == player1.CurrentCell)
             {
+                var healAmount = GridManager.Instance?.GetHealAmountAt(clickedCell) ?? 0;
+        
+                if (healAmount > 0)
+                {
+                    UIController.Instance?.ShowWarning("У вас есть шанс спастись!",
+                        $"Нажмите [Пробел] или 'Завершение хода', чтобы подобрать +{healAmount} HP");
+                    return;
+                }
+                
                 if (selectedAbility is MoveAbilityData)
                 {
                     UIController.Instance?.ShowWarning("Вы уже здесь!", "Вы стоите на этой клетке");
@@ -226,6 +257,16 @@ namespace Core
                 }
 
                 return;
+            }
+
+            if (selectedAbility is MoveAbilityData)
+            {
+                if (GridManager.Instance != null && GridManager.Instance.IsTrapAt(clickedCell))
+                {
+                    UIController.Instance?.ShowWarning("Это ловушка!",
+                        "Вы можете толкать на шипы монстров, а они могут вас");
+                    return;
+                }
             }
 
             // Внутри теоретического радиуса
@@ -330,7 +371,31 @@ namespace Core
             }
             else
             {
-                UIController.Instance?.ShowWarning("Слишком далеко!", $"Эта клетка находится вне радиуса действия способности");
+                var player = PlayerMovement.Instance;
+                if (player != null)
+                {
+                    var distance = Mathf.Max(
+                        Mathf.Abs(clickedCell.x - player.CurrentCell.x),
+                        Mathf.Abs(clickedCell.y - player.CurrentCell.y)
+                    );
+
+                    if (selectedAbility is RangedAttackAbilityData || selectedAbility is StunAbilityData)
+                    {
+                        if (distance < selectedAbility.displayMinRange)
+                        {
+                            UIController.Instance?.ShowWarning("Слишком близко!",
+                                $"Минимальная дистанция для этой способности: {selectedAbility.displayMinRange}");
+                            return;
+                        }
+                    }
+
+                    UIController.Instance?.ShowWarning("Слишком далеко!",
+                        $"Эта клетка находится вне радиуса действия способности");
+                }
+                else
+                {
+                    UIController.Instance?.ShowWarning("Слишком далеко!", "Эта клетка находится вне радиуса действия способности");
+                }
             }
         }
 
@@ -421,6 +486,15 @@ namespace Core
             isExecuting = false;
             RefreshAbilityOverlay();
             RefreshInfoPanel();
+            
+            // if (TutorialManager.Instance != null && TutorialManager.Instance.IsTutorialActive)
+            // {
+            //     var step = TutorialManager.Instance.CurrentStep;
+            //     if (step.requiredAction == TutorialActionType.ClickCell && targetCell.x == step.targetCell.x && targetCell.y == step.targetCell.y)
+            //     {
+            //         TutorialManager.Instance.NotifyActionCompleted(TutorialActionType.ClickCell);
+            //     }
+            // }
         }
 
         public void CancelExecution()

@@ -10,14 +10,14 @@ public class GridManager : MonoBehaviour
     #region Core
 
     public static GridManager Instance { get; private set; }
-    
+
     [SerializeField] private TileObjectDatabase tileObjectDatabase;
-    
-    private Tilemap floorTilemap;          // Определяет игровое поле (где можно ходить)
-    private Tilemap wallsTilemap;          // Блокируют стрельбу (но не ходьбу)
-    private Tilemap wallsInnerTilemap;     // Внутренние стены (блокируют всё)
-    private Tilemap obstaclesTilemap;      // Блокируют ходьбу, но не стрельбу (полустенки)
-    private Tilemap objectsTilemap;        // Ловушки + хилки
+
+    private Tilemap floorTilemap; // Определяет игровое поле (где можно ходить)
+    private Tilemap wallsTilemap; // Блокируют стрельбу (но не ходьбу)
+    private Tilemap wallsInnerTilemap; // Внутренние стены (блокируют всё)
+    private Tilemap obstaclesTilemap; // Блокируют ходьбу, но не стрельбу (полустенки)
+    private Tilemap objectsTilemap; // Ловушки + хилки
 
     private readonly Dictionary<Vector3Int, GameObject> entitiesOnGrid = new();
     private readonly Dictionary<Vector3Int, ITileObject> tileObjectsOnGrid = new();
@@ -25,7 +25,7 @@ public class GridManager : MonoBehaviour
     private GridPathfinder pathfinder;
 
     #endregion
-    
+
     #region Initialization
 
     private void Awake()
@@ -38,7 +38,7 @@ public class GridManager : MonoBehaviour
         else
             Destroy(gameObject);
     }
-    
+
     /// <summary>
     /// Обновляет данные комнаты: все слои тайлмапов
     /// </summary>
@@ -46,19 +46,19 @@ public class GridManager : MonoBehaviour
     {
         ClearTileObjects();
         entitiesOnGrid.Clear();
-        
+
         floorTilemap = floor;
         wallsTilemap = walls;
         wallsInnerTilemap = wallsInner;
         obstaclesTilemap = obstacles;
         objectsTilemap = objects;
-        
+
         if (tileObjectDatabase != null && objectsTilemap != null)
         {
             InitializeTileObjects();
         }
     }
-    
+
     /// <summary>
     /// Автоматически создаёт объекты (ловушки/хилки) из тайлмапа
     /// </summary>
@@ -76,7 +76,7 @@ public class GridManager : MonoBehaviour
             {
                 var obj = Instantiate(prefab, transform);
                 obj.name = $"{tile.name}_Logic_{pos}";
-            
+
                 var tileObject = obj.GetComponent<ITileObject>();
                 if (tileObject != null)
                 {
@@ -85,9 +85,10 @@ public class GridManager : MonoBehaviour
                 }
             }
         }
-    
+
         Debug.Log($"<color=green>[GridManager]</color> Инициализировано {tileObjectsOnGrid.Count} tile objects");
     }
+
     private void ClearTileObjects()
     {
         foreach (var obj in tileObjectsOnGrid.Values)
@@ -95,6 +96,7 @@ public class GridManager : MonoBehaviour
             if (obj is MonoBehaviour mb && mb != null)
                 Destroy(mb.gameObject);
         }
+
         tileObjectsOnGrid.Clear();
     }
 
@@ -388,6 +390,55 @@ public class GridManager : MonoBehaviour
 
     #endregion
 
+    #region Tile Object Helpers (добавить в конец класса)
+
+    /// <summary>
+    /// Возвращает TileObject на указанной позиции, если он есть
+    /// </summary>
+    public ITileObject GetTileObjectAt(Vector3Int cellPos)
+    {
+        if (tileObjectsOnGrid.TryGetValue(cellPos, out var tileObject))
+        {
+            return tileObject;
+        }
+
+        return null;
+    }
+
+    public int GetHealAmountAt(Vector3Int cellPos)
+    {
+        var tileObject = GetTileObjectAt(cellPos);
+
+        if (tileObject is HealZone healZone)
+        {
+            return healZone.HealAmount;
+        }
+
+        return 0;
+    }
+
+
+    /// <summary>
+    /// Проверяет, является ли TileObject хилкой
+    /// </summary>
+    public bool IsHealingItemAt(Vector3Int cellPos)
+    {
+        return GetTileObjectAt(cellPos) is HealZone;
+    }
+
+    /// <summary>
+    /// Проверяет, является ли TileObject ловушкой
+    /// </summary>
+    /// <param name="cellPos">Позиция для проверки</param>
+    /// <returns>True, если это ловушка</returns>
+    public bool IsTrapAt(Vector3Int cellPos)
+    {
+        return GetTileObjectAt(cellPos) is SpikeTrap;
+    }
+
+    #endregion
+
+
     #region Knockback Support
 
     /// <summary>
@@ -417,7 +468,7 @@ public class GridManager : MonoBehaviour
 
         return true;
     }
-    
+
     /// <summary>
     /// Удаляет tile object из словаря и визуально (для подбираемых хилок)
     /// </summary>
@@ -426,13 +477,13 @@ public class GridManager : MonoBehaviour
         if (tileObjectsOnGrid.TryGetValue(pos, out var obj))
         {
             tileObjectsOnGrid.Remove(pos);
-        
+
             if (obj is MonoBehaviour mb && mb != null)
                 Destroy(mb.gameObject);
-        
+
             if (objectsTilemap != null)
                 objectsTilemap.SetTile(pos, null);
-        
+
             Debug.Log($"<color=yellow>[GridManager]</color> Tile object удален в {pos}");
         }
     }
@@ -475,7 +526,8 @@ public class GridManager : MonoBehaviour
     /// <param name="target">Целевая клетка</param>
     /// <param name="currentEntity">Сущность для которой строится путь</param>
     /// <returns>Список клеток пути или пустой список, если путь не найден</returns>
-    public List<Vector3Int> GetPath(Vector3Int start, Vector3Int target, GameObject currentEntity = null, System.Func<Vector3Int, bool> boundaryCheck = null)
+    public List<Vector3Int> GetPath(Vector3Int start, Vector3Int target, GameObject currentEntity = null,
+        System.Func<Vector3Int, bool> boundaryCheck = null)
     {
         return pathfinder.GetPath(start, target, CellCheckOptions.ForMovement(currentEntity, boundaryCheck));
     }
@@ -496,7 +548,7 @@ public class GridManager : MonoBehaviour
 
     public List<Vector3Int> GetAttackableCellsInRadius(Vector3Int center, int maxRange, int minRange = 1)
         => GetCellsInRange(center, maxRange, minRange, CellCheckOptions.ForAttack());
-    
+
     /// <summary>
     /// Возвращает клетки, с которых можно выстрелить в указанную цель
     /// </summary>
@@ -505,28 +557,29 @@ public class GridManager : MonoBehaviour
     /// <param name="maxRange">Максимальная дистанция</param>
     /// <param name="currentEntity">Сущность, для которой выполняется поиск позиции</param>
     /// <returns>Список клеток, с которых можно стрелять</returns>
-    public List<Vector3Int> GetShootablePositionsTo(Vector3Int sourcePos, Vector3Int targetCell, int minRange, int maxRange, GameObject currentEntity = null)
+    public List<Vector3Int> GetShootablePositionsTo(Vector3Int sourcePos, Vector3Int targetCell, int minRange,
+        int maxRange, GameObject currentEntity = null)
     {
         var result = new List<Vector3Int>();
-    
+
         var walkableCells = GetWalkableCellsInRange(sourcePos, maxRange, currentEntity);
-    
+
         foreach (var cell in walkableCells)
         {
             var distance = Mathf.Abs(cell.x - targetCell.x) + Mathf.Abs(cell.y - targetCell.y);
-        
+
             if (distance < minRange || distance > maxRange)
                 continue;
-        
+
             if (!HasLineOfSight(cell, targetCell))
                 continue;
-        
+
             if (!IsCellShootable(targetCell))
                 continue;
-        
+
             result.Add(cell);
         }
-    
+
         return result;
     }
 

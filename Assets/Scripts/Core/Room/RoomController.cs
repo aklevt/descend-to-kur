@@ -429,6 +429,17 @@ namespace Core.Room
                 .Where(e => e != null && e.Stats != null && !e.Stats.IsDead)
                 .ToList();
         }
+        
+        /// <summary>
+        /// Принудительное завершение комнаты (для пустых секций)
+        /// </summary>
+        public void ForceComplete()
+        {
+            if (isCleared) return;
+    
+            Debug.Log("<color=green>[RoomController]</color> Принудительное завершение комнаты (пустая секция)");
+            CompleteRoom();
+        }
     }
 
     public enum RoomObjectiveType

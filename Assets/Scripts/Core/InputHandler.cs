@@ -16,14 +16,30 @@ namespace Core
         private float previewHoverTimer;
         private bool previewShown;
         
+        private Vector2 lastMousePosition;
+        private const float MouseMovementThreshold = 5f;
+        
         private void Awake()
         {
             mainCamera = Camera.main;
         }
 
+        private void Start()
+        {
+            if (Mouse.current != null)
+            {
+                lastMousePosition = Mouse.current.position.ReadValue();
+            }
+        }
+
         private void Update()
         {
             if (!Application.isFocused) return;
+
+            if (CheckPriorityWarningInput())
+            {
+                // return;
+            }
             
             HandleSystemInput();
             
@@ -48,6 +64,39 @@ namespace Core
                 case GameState.Transition:
                     break;
             }
+        }
+        
+        private bool CheckPriorityWarningInput()
+        {
+            if (UI.UIController.Instance?.IsPriorityWarningActive != true)
+                return false;
+
+            if (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame)
+            {
+                UI.UIController.Instance.DismissPriorityWarning();
+                return true;
+            }
+
+            if (Mouse.current != null)
+            {
+                var currentMousePos = Mouse.current.position.ReadValue();
+                var delta = Vector2.Distance(currentMousePos, lastMousePosition);
+
+                if (delta > MouseMovementThreshold)
+                {
+                    lastMousePosition = currentMousePos;
+                    UI.UIController.Instance.DismissPriorityWarning();
+                    return true;
+                }
+            }
+
+            if (Mouse.current != null && (Mouse.current.leftButton.wasPressedThisFrame || Mouse.current.rightButton.wasPressedThisFrame))
+            {
+                UI.UIController.Instance.DismissPriorityWarning();
+                return true;
+            }
+
+            return true;
         }
         
         /// <summary>
@@ -98,6 +147,11 @@ namespace Core
             HandleAbilityHotkeys();
             HandleEndTurnInput();
             HandleMouseInput();
+            
+            if (Mouse.current != null)
+            {
+                lastMousePosition = Mouse.current.position.ReadValue();
+            }
             
             if (AbilityController.Instance?.ConsumeHoverUpdateRequest() == true)
             {
