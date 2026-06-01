@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f35bc3a3345e9614e81a1e7e5bb3b60a, type: 3}
   m_Name: MumiaStats
   m_EditorClassIdentifier: GameScripts::Stats.EntityStats
+  entityName: "\u0411\u043B\u0438\u0436\u043D\u0438\u043A"
   maxHealth: 15
   moveRange: 3
   baseAttackDamage: 5

@@ -7,6 +7,10 @@ namespace Stats
     /// </summary>
     public abstract class EntityStatsBase : ScriptableObject
     {
+        [Header("Base Info")]
+        [Tooltip("Отображаемое имя сущности")]
+        public string entityName = "Сущность";
+
         [Header("Base Stats")]
         [Tooltip("Максимальное здоровье")]
         public int maxHealth = 20;
