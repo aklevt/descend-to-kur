@@ -9918,6 +9918,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelController
   roomPrefabs:
   - {fileID: 1108904379850795440, guid: cea7596b574235f4fab760b025578343, type: 3}
+  - {fileID: 1108904379850795440, guid: cea7596b574235f4fab760b025578343, type: 3}
   - {fileID: 1108904379850795440, guid: 9ad1387702c06fa449c5f314e7e81815, type: 3}
   - {fileID: 1108904379850795440, guid: f86978306ea04f345a0495d126cdf4ce, type: 3}
   - {fileID: 1108904379850795440, guid: 982b0b107ca257e4f804d168ad109d46, type: 3}
