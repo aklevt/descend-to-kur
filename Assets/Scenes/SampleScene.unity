@@ -8247,8 +8247,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelController
   roomPrefabs:
-  - {fileID: 1108904379850795440, guid: cea7596b574235f4fab760b025578343, type: 3}
-  - {fileID: 1108904379850795440, guid: 7fef7ae4ac3ba254cae89ca224f2da0f, type: 3}
+  - {fileID: 1108904379850795440, guid: 9ad1387702c06fa449c5f314e7e81815, type: 3}
   - {fileID: 1108904379850795440, guid: f86978306ea04f345a0495d126cdf4ce, type: 3}
   - {fileID: 1108904379850795440, guid: 982b0b107ca257e4f804d168ad109d46, type: 3}
   playerPrefab: {fileID: 39971611221549213, guid: 971cd5dc1690caf44a0e43bf8e7c81b0, type: 3}
@@ -12327,6 +12326,8 @@ MonoBehaviour:
   popupDuration: 1
   fadeDuration: 0.2
   floatOffset: 10
+  blinkSpeed: 1.5
+  maxPriorityDuration: 10
 --- !u!114 &1763753700
 MonoBehaviour:
   m_ObjectHideFlags: 0
