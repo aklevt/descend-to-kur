@@ -1,3 +1,4 @@
+// --- FILE: Assets/Scripts/UI/PauseMenu.cs ---
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,11 +13,13 @@ namespace UI
         [SerializeField] private Button mainMenuButton;
         [SerializeField] private Button restartButton;
 
-        [Header("Scene Names")] [SerializeField]
-        private string mainMenuSceneName = "MainMenu";
+        [Header("Scene Names")] 
+        [SerializeField] private string mainMenuSceneName = "MainMenu";
 
-        [Header("Audio")] [SerializeField] private Slider volumeSlider;
+        [Header("Audio")] 
+        [SerializeField] private Slider volumeSlider;
         [SerializeField] private TextMeshProUGUI volumeText;
+        [SerializeField] private float musicFadeDuration = 0.5f;
 
         private void Start()
         {
@@ -30,19 +33,24 @@ namespace UI
                 mainMenuButton.onClick.AddListener(OnMainMenuClicked);
 
             SetupAudio();
-            // Hide();
         }
 
         public void Show()
         {
+            SyncSliderWithTrack();
+
             if (panel != null)
                 panel.SetActive(true);
+            
+            // Вызов приглушения убран. Музыка продолжает играть как раньше.
         }
 
         public void Hide()
         {
             if (panel != null)
                 panel.SetActive(false);
+            
+            // Вызов возврата громкости убран.
         }
 
         private void OnResumeClicked()
@@ -53,19 +61,20 @@ namespace UI
         private void OnRestartClicked()
         {
             Debug.Log("[PauseMenu] Комната перезапускается");
-
             UIManager.Instance?.TogglePause();
-
             Core.LevelController.Instance?.RestartCurrentRoom();
         }
 
         private void OnMainMenuClicked()
         {
             Debug.Log("[PauseMenu] Возврат в главное меню");
-
             Core.SaveSystem.SaveGame();
-
             Time.timeScale = 1f;
+
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.StopMusic(musicFadeDuration);
+            }
 
             SceneManager.LoadScene(mainMenuSceneName);
         }
@@ -75,17 +84,6 @@ namespace UI
             UIManager.Instance?.TogglePause();
         }
 
-
-        //         private void OnMainMenuClicked()
-        //         {
-        //             Debug.Log("[PauseMenu] Quit button pressed");
-        //             Application.Quit();
-        //             
-        // #if UNITY_EDITOR
-        //             UnityEditor.EditorApplication.isPlaying = false;
-        // #endif
-        //         }
-
         #region Audio
 
         private void SetupAudio()
@@ -93,30 +91,27 @@ namespace UI
             if (volumeSlider != null)
             {
                 volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
-
-                LoadAudioSettings();
+                var savedVolume = PlayerPrefs.GetFloat("MasterVolume", 1f);
+                volumeSlider.SetValueWithoutNotify(savedVolume);
+                UpdateVolumeText();
             }
         }
 
-        /// <summary>
-        /// Загрузка сохраненных настроек звука
-        /// </summary>
-        private void LoadAudioSettings()
+        private void SyncSliderWithTrack()
         {
             if (volumeSlider == null) return;
-
             var savedVolume = PlayerPrefs.GetFloat("MasterVolume", 1f);
-
             volumeSlider.SetValueWithoutNotify(savedVolume);
-
-            AudioListener.volume = savedVolume;
-
             UpdateVolumeText();
         }
 
         private void OnVolumeChanged(float value)
         {
-            AudioListener.volume = value;
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.SetVolume(value);
+            }
+
             PlayerPrefs.SetFloat("MasterVolume", value);
             PlayerPrefs.Save();
             UpdateVolumeText();
@@ -130,10 +125,7 @@ namespace UI
 
         private void OnEnable()
         {
-            if (volumeSlider != null && PlayerPrefs.HasKey("MasterVolume"))
-            {
-                volumeSlider.value = PlayerPrefs.GetFloat("MasterVolume", 1f);
-            }
+            SyncSliderWithTrack();
         }
 
         #endregion

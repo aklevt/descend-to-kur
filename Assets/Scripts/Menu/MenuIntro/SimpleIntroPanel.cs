@@ -88,7 +88,7 @@ namespace UI.Menu
             {
                 textDisplay.text = "";
                 
-                for (int i = 0; i <= text.Length; i++)
+                for (var i = 0; i <= text.Length; i++)
                 {
                     if (!isActive) yield break;
                     
@@ -140,7 +140,7 @@ namespace UI.Menu
             if (panel != null)
                 panel.SetActive(false);
 
-            string sceneName = introData?.gameplaySceneName ?? "SampleScene";
+            var sceneName = introData?.gameplaySceneName ?? "SampleScene";
             SceneManager.LoadScene(sceneName);
         }
 

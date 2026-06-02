@@ -398,7 +398,7 @@ MonoBehaviour:
   dialogueData: {fileID: 11400000, guid: 31114690631d9b740a6d4a88eb60a941, type: 2}
   triggerType: 0
   delayBefore: 0
-  playOnce: 1
+  playOnce: 0
 --- !u!1 &3949807490716531019
 GameObject:
   m_ObjectHideFlags: 0

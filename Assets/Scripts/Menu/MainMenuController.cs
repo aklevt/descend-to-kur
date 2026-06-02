@@ -15,7 +15,7 @@ namespace UI.Menu
         [Header("Intro")]
         [SerializeField] private SimpleIntroPanel introPanel;
         [SerializeField] private IntroData fallbackIntroData;
-
+        
         private void Start()
         {
             continueButton.onClick.AddListener(OnContinue);
@@ -48,14 +48,7 @@ namespace UI.Menu
             SaveSystem.ClearSave();
             SaveSystem.StartNewGame();
             
-            if (introPanel != null)
-            {
-                introPanel.StartIntro();
-            }
-            else
-            {
-                LoadGameplayScene();
-            }
+            LoadGameplayScene();
         }
 
         private void OnExit()
@@ -69,7 +62,7 @@ namespace UI.Menu
 
         private void LoadGameplayScene()
         {
-            string sceneName = fallbackIntroData?.gameplaySceneName ?? "SampleScene";
+            var sceneName = "SampleScene";
             SceneManager.LoadScene(sceneName);
         }
     }
