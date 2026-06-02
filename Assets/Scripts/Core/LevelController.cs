@@ -17,6 +17,7 @@ namespace Core
         public static LevelController Instance { get; private set; }
 
         public event Action<int, int> OnRoomChanged;
+        public event Action OnRoomCleared;
 
         [Header("Level Progression")] [SerializeField]
         private List<GameObject> roomPrefabs;
@@ -277,6 +278,8 @@ namespace Core
             AbilityController.Instance?.BlockInput();
 
             GameStateManager.Instance?.SetState(GameState.Transition);
+            
+            OnRoomCleared?.Invoke();
 
             Debug.Log("<color=green>[LevelController]</color> Комната пройдена!");
             StartCoroutine(TransitionToNextRoom());

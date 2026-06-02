@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Abilities;
 using Core.Room;
@@ -30,7 +31,9 @@ namespace Core
         private bool isDead;
         private bool isInputBlocked;
         private bool needsHoverUpdate;
-
+        
+        public static event Action<int> OnAbilitySelected;
+        
         public AbilityData SelectedAbility => selectedAbility;
 
         public List<Vector3Int> AvailableCells => availableCells;
@@ -147,6 +150,7 @@ namespace Core
             //         TutorialManager.Instance.NotifyActionCompleted(TutorialActionType.SelectAbility);
             //     }
             // }
+            Core.Tutorial.TutorialManager.Instance?.HandleAbilitySelected(index);
         }
 
         private void CheckAbilityResourcesAndWarn(AbilityData targetAbility, int index)

@@ -59,7 +59,9 @@ namespace Core
             if (health != null) health.OnDeath += HandleCurrentEnemyDied;
 
             GridHighlighter.Instance?.DimPlayerHighlights();
-
+            
+            Core.Tutorial.TutorialManager.Instance?.NotifyEnemyHovered();
+            
             if (showMove) ShowMovePreview(enemy);
             else ShowAttackPreview(enemy);
 
@@ -116,6 +118,8 @@ namespace Core
 
         private void ShowMovePreview(EnemyBase enemy)
         {
+            Core.Tutorial.TutorialManager.Instance?.NotifyEnemyAltHovered();
+            
             var range = enemy.Stats.MoveRange;
             if (range <= 0)
             {

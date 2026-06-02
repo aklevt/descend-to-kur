@@ -46,7 +46,7 @@ namespace Core.Room
 
         public event Action OnRoomCleared;
         public event Action<Bounds> OnCameraBoundsChanged;
-
+        
         private List<EnemyBase> enemiesInRoom = new();
         private List<RoomDialogueTrigger> dialogueTriggers = new();
         private SectionManager sectionManager;

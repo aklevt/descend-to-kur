@@ -11,6 +11,7 @@ namespace UI.Tutorial
         [SerializeField] private GameObject container;
         [SerializeField] private TextMeshProUGUI titleText;
         [SerializeField] private TextMeshProUGUI descriptionText;
+        [SerializeField] private TextMeshProUGUI ObjectiveText;
         [SerializeField] private Image avatarImage;
 
         [Header("Controls")]
@@ -38,12 +39,13 @@ namespace UI.Tutorial
             if (closeButton != null) closeButton.onClick.RemoveListener(OnClosePressed);
         }
 
-        public void Show(string title, string description, Sprite avatar, bool hasNext, bool hasBack)
+        public void Show(string title, string description, string objective, Sprite avatar, bool hasNext, bool hasBack)
         {
             container.SetActive(true);
             
             if (titleText != null) titleText.text = title;
             if (descriptionText != null) descriptionText.text = description;
+            if (ObjectiveText != null) ObjectiveText.text = objective;
 
             if (avatarImage != null)
             {

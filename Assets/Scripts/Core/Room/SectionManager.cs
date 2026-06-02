@@ -12,6 +12,8 @@ namespace Core.Room
     {
         private readonly List<RoomSection> sections = new();
         private int currentSectionIndex = 0;
+        
+        public static event Action<int> OnGlobalSectionEntered;
 
         public RoomSection CurrentSection => sections.Count > 0 && currentSectionIndex < sections.Count
             ? sections[currentSectionIndex]
@@ -224,7 +226,8 @@ namespace Core.Room
     
             NotifyBoundsChanged();
             OnSectionEntered?.Invoke(index);
-
+            OnGlobalSectionEntered?.Invoke(index);
+            
             Debug.Log($"<color=green>[SectionManager]</color> Секция {index} активирована (Врагов: {section.Enemies.Count}, Зачищена: {section.IsCleared})");
         }
 

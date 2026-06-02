@@ -281,6 +281,8 @@ namespace Core
                 if (enemyBase != null)
                 {
                     UI.HUD.EnemyInfoManager.Instance?.OnEnemyHover(entity);
+                    
+                    
                     return;
                 }
             }
@@ -370,6 +372,7 @@ namespace Core
             if (previewHoverTimer < PreviewHoverDelay) return;
 
             var shown = EnemyPreviewSystem.Instance?.TryShowPreview(hoveredCell, altHeld) ?? false;
+
             previewShown = shown;
 
             if (!shown)

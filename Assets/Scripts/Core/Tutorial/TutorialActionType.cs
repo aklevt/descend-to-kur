@@ -5,6 +5,11 @@ namespace Core.Tutorial
         None,
         SelectAbility,
         ClickCell,
-        EndTurn
+        EndTurn,
+        EnterSection,    
+        HoverEnemy,      
+        HoverAltEnemy,
+        ApproachEnemy,   
+        KillMonster      
     }
 }
