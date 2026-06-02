@@ -58,14 +58,23 @@ namespace UI.HUD
         
         private void Update()
         {
-            if (currentHoveredEnemy != null && currentDisplay != null && !isDisplayShown)
+            if (currentHoveredEnemy == null || currentDisplay == null) return;
+
+            if (!isDisplayShown)
             {
                 hoverTimer += Time.unscaledDeltaTime;
-                
+        
                 if (hoverTimer >= hoverDelay)
                 {
                     ShowCurrentDisplay();
                 }
+            }
+            else
+            {
+                var showAltHint = ShouldShowAltHint();
+                var inAttackRange = IsEnemyInAttackRange(currentHoveredEnemy);
+        
+                currentDisplay.Show(showAltHint, inAttackRange); 
             }
         }
         
