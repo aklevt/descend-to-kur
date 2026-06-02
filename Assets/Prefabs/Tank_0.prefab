@@ -157,7 +157,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: GameScripts::Entities.TankEnemy
   abilities:
-  - {fileID: 11400000, guid: 747955dec6ff0044cae7c64f6d226380, type: 2}
+  - {fileID: 11400000, guid: c8b8d187c4b606748a4c71e47f445361, type: 2}
   baseStats: {fileID: 11400000, guid: 9b5168f93fb78e24ea988a0bae1cfaaf, type: 2}
   stats:
     isCustomized: 0

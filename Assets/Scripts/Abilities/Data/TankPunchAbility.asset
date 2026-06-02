@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2db69245ffc348969c1b2244ca9b19d5, type: 3}
-  m_Name: TankPunch
+  m_Name: TankPunchAbility
   m_EditorClassIdentifier: GameScripts::Abilities.TankPunchAbilityData
   abilityName: 
   displayMinRange: 0
@@ -24,6 +24,5 @@ MonoBehaviour:
   forceProceduralPunch: 0
   useDiagonalPunch: 0
   limitOncePerTurn: 0
-  excludeKnightMoves: 0
   knockbackDistance: 2
-  impactPause: 0.1
+  impactPause: 0.15
