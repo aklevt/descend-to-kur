@@ -23,7 +23,7 @@ namespace Abilities
             var rawCells = GridManager.Instance.GetAttackableCellsInRadius(origin, 1)
                 .SelectMany(x => RadiusToEffectCells(x, actor))
                 .ToList();
-            return rawCells;
+            //return rawCells;
 
             var filteredCells = new List<Vector3Int>();
 

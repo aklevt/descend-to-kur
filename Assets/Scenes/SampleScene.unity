@@ -9978,10 +9978,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelController
   roomPrefabs:
   - {fileID: 1108904379850795440, guid: cea7596b574235f4fab760b025578343, type: 3}
-  - {fileID: 1108904379850795440, guid: cea7596b574235f4fab760b025578343, type: 3}
   - {fileID: 1108904379850795440, guid: 9ad1387702c06fa449c5f314e7e81815, type: 3}
   - {fileID: 1108904379850795440, guid: f86978306ea04f345a0495d126cdf4ce, type: 3}
-  - {fileID: 1108904379850795440, guid: 982b0b107ca257e4f804d168ad109d46, type: 3}
+  - {fileID: 1108904379850795440, guid: 0f67b905cd5c8b24d86f7fd30082a3dd, type: 3}
+  - {fileID: 1108904379850795440, guid: 55e4aeb89dfc9044c822a35f14ea13ff, type: 3}
+  - {fileID: 1108904379850795440, guid: 59d0f1e6ee5fe5047a48db1a23edc2b6, type: 3}
   defaultGameplayMusic: {fileID: 8300000, guid: d362158678d74174393fabfabe9b3ae1, type: 3}
   finalRoomMusic: {fileID: 8300000, guid: ea53628560cd60640bd516ab91baadf7, type: 3}
   musicFadeDuration: 1
