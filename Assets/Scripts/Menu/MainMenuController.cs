@@ -63,7 +63,15 @@ namespace UI.Menu
         private void LoadGameplayScene()
         {
             var sceneName = "SampleScene";
-            SceneManager.LoadScene(sceneName);
+    
+            if (Core.SceneTransitioner.Instance != null)
+            {
+                Core.SceneTransitioner.Instance.SwitchScene(sceneName);
+            }
+            else
+            {
+                SceneManager.LoadScene(sceneName);
+            }
         }
     }
 }

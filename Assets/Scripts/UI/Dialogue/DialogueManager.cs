@@ -8,7 +8,7 @@ namespace UI.Dialogue
     /// <summary>
     /// Управляет диалоговой системой
     /// </summary>
-    public class DialogueManager : MonoBehaviour
+public class DialogueManager : MonoBehaviour
     {
         public static DialogueManager Instance { get; private set; }
 
@@ -16,13 +16,14 @@ namespace UI.Dialogue
         [SerializeField] private SubtitleDialogueUI subtitleUI;
         [SerializeField] private InGameDialogueUI inGameUI;
         [SerializeField] private FullscreenDialogueUI fullscreenUI;
+        [SerializeField] private CinematicDialogueUI cinematicUI;
         
         [Header("Settings")]
         [SerializeField] private float inputDebounceDelay = 0.5f;
 
         private Dictionary<DialogueStyle, IDialogueView> dialogueViews;
-        
         private DialogueState dialogueState = new();
+        private bool inputBlockedThisFrame = false;
         
         public bool IsDialogueActive => dialogueState.IsActive;
 
@@ -42,18 +43,12 @@ namespace UI.Dialogue
             InitializeViews();
         }
 
-        // private void Update()
-        // {
-        //     if (!dialogueState.IsActive) return;
-        //     
-        //     HandleDialogueInput();
-        // }
-
         private void InitializeViews()
         {
             if (subtitleUI != null) dialogueViews.Add(DialogueStyle.Subtitle, subtitleUI);
             if (inGameUI != null) dialogueViews.Add(DialogueStyle.InGame, inGameUI);
             if (fullscreenUI != null) dialogueViews.Add(DialogueStyle.Fullscreen, fullscreenUI);
+            if (cinematicUI != null) dialogueViews.Add(DialogueStyle.Cinematic, cinematicUI);
         }
 
         private void HandleDialogueInput()
@@ -88,16 +83,25 @@ namespace UI.Dialogue
 
         public void AdvanceDialogue()
         {
-            if (!dialogueState.CanAdvance()) return;
+            if (!dialogueState.CanAdvance() || inputBlockedThisFrame) return;
 
             if (dialogueState.CurrentView.IsTyping)
             {
                 dialogueState.CurrentView.CompleteCurrentLine();
+                
+                StartCoroutine(BlockInputRoutine());
             }
             else if (dialogueState.IsWaitingForInput)
             {
                 dialogueState.ContinueToNext();
             }
+        }
+
+        private IEnumerator BlockInputRoutine()
+        {
+            inputBlockedThisFrame = true;
+            yield return null;
+            inputBlockedThisFrame = false;
         }
 
         public void SkipDialogue()
@@ -129,8 +133,10 @@ namespace UI.Dialogue
             {
                 var line = dialogueState.GetCurrentLine();
                 
+                var displayRoutine = StartCoroutine(DisplayLineWrapper(line));
+                yield return displayRoutine;
+                
                 dialogueState.StartWaitingForInput();
-                yield return dialogueState.CurrentView.DisplayLine(line, dialogueState.Data.typewriterSpeed);
                 yield return new WaitUntil(() => !dialogueState.IsWaitingForInput);
                 
                 dialogueState.MoveToNextLine();
@@ -138,6 +144,11 @@ namespace UI.Dialogue
 
             yield return dialogueState.CurrentView.Hide();
             EndDialogue();
+        }
+
+        private IEnumerator DisplayLineWrapper(DialogueLine line)
+        {
+            yield return dialogueState.CurrentView.DisplayLine(line, dialogueState.Data.typewriterSpeed);
         }
 
         private IEnumerator SkipRoutine()
@@ -149,6 +160,8 @@ namespace UI.Dialogue
             
             EndDialogue();
         }
+
+        private void BlackoutScreenIfNeeded() { }
 
         private void EndDialogue()
         {
@@ -178,7 +191,6 @@ namespace UI.Dialogue
             return true;
         }
     }
-
     /// <summary>
     /// Состояние диалоговой системы
     /// </summary>

@@ -820,7 +820,7 @@ namespace Entities
         /// <summary>
         /// Получить финальную скорость анимации с учётом глобальных и локальных настроек
         /// </summary>
-        public float GetAnimationSpeedMultiplier()
+        public virtual float GetAnimationSpeedMultiplier()
         {
             var globalMultiplier = SettingsManager.Instance?.Settings.globalAnimationSpeedMultiplier ?? 1f;
             return globalMultiplier * localAnimationSpeedMultiplier;

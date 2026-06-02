@@ -13,6 +13,7 @@ namespace Core.Tutorial
         [SerializeField] private DialogueData storyDialogueToWait;
 
         private bool hasTriggered = false;
+        private bool wasDialogueDetected = false;
 
         private void Update()
         {
@@ -20,9 +21,16 @@ namespace Core.Tutorial
 
             if (storyDialogueToWait != null)
             {
-                if (DialogueProgress.IsCompleted(storyDialogueToWait.DialogueID))
+                if (DialogueManager.Instance != null)
                 {
-                    if (DialogueManager.Instance != null && !DialogueManager.Instance.IsDialogueActive)
+                    bool isDialogueActive = DialogueManager.Instance.IsDialogueActive;
+
+                    if (isDialogueActive && !wasDialogueDetected)
+                    {
+                        wasDialogueDetected = true;
+                    }
+
+                    if (wasDialogueDetected && !isDialogueActive)
                     {
                         TriggerTutorial();
                     }
@@ -40,7 +48,7 @@ namespace Core.Tutorial
             {
                 hasTriggered = true;
                 TutorialManager.Instance.StartTutorial(tutorialData);
-                enabled = false; 
+                enabled = false;
             }
         }
     }

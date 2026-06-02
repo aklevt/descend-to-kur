@@ -92,6 +92,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 511264061922325711}
   - {fileID: 4454474519498634064}
   - {fileID: 7901744147490316323}
   - {fileID: 6641976380326477419}
@@ -765,6 +766,54 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameScripts::Core.Tutorial.RoomTutorialTrigger
   tutorialData: {fileID: 11400000, guid: 72ca84515cb8f4d4ca6500692b4c7207, type: 2}
   storyDialogueToWait: {fileID: 11400000, guid: 31114690631d9b740a6d4a88eb60a941, type: 2}
+--- !u!1 &8728529701678586994
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 511264061922325711}
+  - component: {fileID: 7757148222242545727}
+  m_Layer: 0
+  m_Name: DialogueTrigger_Intro
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &511264061922325711
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8728529701678586994}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3022239555185988315}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7757148222242545727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8728529701678586994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b92aa5f8e8b464e90b594a4cfe37772, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameScripts::UI.RoomDialogueTrigger
+  dialogueData: {fileID: 11400000, guid: 54f4f3d9720eb4747bb7320fd577e331, type: 2}
+  triggerType: 0
+  delayBefore: 0
+  playOnce: 0
 --- !u!1001 &2050010774915569976
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -931,7 +980,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7203059866160028534, guid: 0cba811be4e8af342acbcb83d3c531ed, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 62.57
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7203059866160028534, guid: 0cba811be4e8af342acbcb83d3c531ed, type: 3}
       propertyPath: m_AnchoredPosition.x

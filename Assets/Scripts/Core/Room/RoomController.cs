@@ -384,7 +384,8 @@ namespace Core.Room
             foreach (var trigger in dialoguesOfType)
             {
                 Debug.Log($"<color=yellow>[RoomController]</color> Запуск диалога: {trigger.DialogueData?.name}");
-                trigger.TriggerDialogue();
+                
+                yield return trigger.TriggerDialogueRoutine();
 
                 yield return new WaitUntil(() =>
                     DialogueManager.Instance == null || !DialogueManager.Instance.IsDialogueActive);
