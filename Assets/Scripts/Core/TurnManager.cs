@@ -13,6 +13,9 @@ public class TurnManager : MonoBehaviour
     public void DebugEnemyTurn() => SetState(TurnState.EnemyTurn);
 
     private List<EnemyBase> allEnemies = new();
+    
+    public event Action OnEnemyKilled;
+    
     private IEnumerator EnemyTurnSequence()
     {
         var activeEnemies = new List<EnemyBase>();
@@ -165,6 +168,9 @@ public class TurnManager : MonoBehaviour
         if (allEnemies.Contains(enemy))
         {
             allEnemies.Remove(enemy);
+            
+            OnEnemyKilled?.Invoke();
+            
             Debug.Log($"<color=red>[TurnManager]</color> Противник удален. Осталось: {allEnemies.Count}");
         }
     }

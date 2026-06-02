@@ -10,6 +10,9 @@ namespace Stats
         [Tooltip("Если true, статы были изменены вручную в инспекторе")]
         public bool isCustomized;
 
+        [Header("Base Info")]
+        public string Name;
+
         [Header("Common")]
         public int Health;
         public int MaxHealth;
@@ -44,6 +47,8 @@ namespace Stats
                 Debug.LogWarning("[EntityRuntimeStats]");
                 return;
             }
+
+            Name = baseStats.entityName;
 
             // Базовые статы
             MaxHealth = baseStats.maxHealth;

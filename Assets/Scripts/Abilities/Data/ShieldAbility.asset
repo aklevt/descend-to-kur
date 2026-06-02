@@ -13,9 +13,12 @@ MonoBehaviour:
   m_Name: ShieldAbility
   m_EditorClassIdentifier: GameScripts::Abilities.ShieldAbilityData
   abilityName: "\u0429\u0438\u0442"
+  displayMinRange: 0
+  displayRange: -1
+  description: 
   energyCost: 8
   bonusDamage: 0
-  overrideBaseDamage: 0
+  overrideBaseDamage: 1
   highlightColor: {r: 0, g: 1, b: 0.62315774, a: 1}
   effectColor: {r: 1, g: 0.8334515, b: 0, a: 0.9}
   forceProceduralPunch: 0

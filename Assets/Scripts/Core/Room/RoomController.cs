@@ -37,7 +37,7 @@ namespace Core.Room
         [Header("Objective")] [SerializeField]
         private RoomObjectiveType objectiveType = RoomObjectiveType.KillAllEnemies;
 
-        [SerializeField] private string victoryMessage = "Комната пройдена";
+        [SerializeField] private string victoryMessage = "Уровень пройден!";
 
         public RoomObjectiveType ObjectiveType => objectiveType;
         public string VictoryMessage => victoryMessage;
@@ -46,7 +46,7 @@ namespace Core.Room
 
         public event Action OnRoomCleared;
         public event Action<Bounds> OnCameraBoundsChanged;
-
+        
         private List<EnemyBase> enemiesInRoom = new();
         private List<RoomDialogueTrigger> dialogueTriggers = new();
         private SectionManager sectionManager;

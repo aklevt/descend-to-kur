@@ -267,8 +267,29 @@ namespace Core
             {
                 lastHoveredCell = hoveredCell;
                 AbilityController.Instance.HandleCellHover(hoveredCell);
+                HandleEnemyInfoHover(hoveredCell);
             }
         }
+        
+        private void HandleEnemyInfoHover(Vector3Int hoveredCell)
+        {
+            var entity = GridManager.Instance?.GetEntityAt(hoveredCell);
+            
+            if (entity != null)
+            {
+                var enemyBase = entity.GetComponent<Entities.EnemyBase>();
+                if (enemyBase != null)
+                {
+                    UI.HUD.EnemyInfoManager.Instance?.OnEnemyHover(entity);
+                    
+                    
+                    return;
+                }
+            }
+            
+            UI.HUD.EnemyInfoManager.Instance?.OnHoverEnd();
+        }
+
         
         /// <summary>
         /// При нажатии/отпускании Alt обновляет превью
@@ -351,6 +372,7 @@ namespace Core
             if (previewHoverTimer < PreviewHoverDelay) return;
 
             var shown = EnemyPreviewSystem.Instance?.TryShowPreview(hoveredCell, altHeld) ?? false;
+
             previewShown = shown;
 
             if (!shown)

@@ -17,9 +17,16 @@ namespace Core
         public static LevelController Instance { get; private set; }
 
         public event Action<int, int> OnRoomChanged;
+        public event Action OnRoomCleared;
 
         [Header("Level Progression")] [SerializeField]
         private List<GameObject> roomPrefabs;
+        
+        [Header("Audio Settings")]
+        [SerializeField] private AudioClip defaultGameplayMusic;
+        [SerializeField] private AudioClip finalRoomMusic;
+        [SerializeField] private float musicFadeDuration = 1.0f;
+        [Range(0f, 1f)] [SerializeField] private float dimmedVolumeMultiplier = 0.2f;
 
         [Header("Player")] [SerializeField] private GameObject playerPrefab;
 
@@ -159,6 +166,13 @@ namespace Core
             if (GameStateManager.Instance != null && !isGameOver)
             {
                 GameStateManager.Instance.SetState(GameState.Gameplay);
+                
+                if (AudioManager.Instance != null)
+                {
+                    var isLastRoom = currentRoomIndex == roomPrefabs.Count - 1;
+                    var activeTrack = isLastRoom ? finalRoomMusic : defaultGameplayMusic;
+                    AudioManager.Instance.PlayMusic(activeTrack, true, musicFadeDuration);
+                }
             }
 
             if (AbilityController.Instance != null)
@@ -277,6 +291,12 @@ namespace Core
             AbilityController.Instance?.BlockInput();
 
             GameStateManager.Instance?.SetState(GameState.Transition);
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.FadeVolume(dimmedVolumeMultiplier, musicFadeDuration);
+            }
+            
+            OnRoomCleared?.Invoke();
 
             Debug.Log("<color=green>[LevelController]</color> Комната пройдена!");
             StartCoroutine(TransitionToNextRoom());
@@ -289,9 +309,14 @@ namespace Core
         {
             yield return new WaitForSeconds(1.5f);
 
+            var isLastRoom = currentRoomIndex >= roomPrefabs.Count - 1;
+
             if (TransitionScreenManager.Instance != null && currentRoom != null)
             {
-                yield return TransitionScreenManager.Instance.ShowVictoryScreen(currentRoom.VictoryMessage);
+                yield return TransitionScreenManager.Instance.ShowVictoryScreen(
+                    currentRoom.VictoryMessage, 
+                    isLastRoom
+                );
             }
 
             currentRoomIndex++;
@@ -314,8 +339,19 @@ namespace Core
             }
             else
             {
-                Debug.Log("<color=cyan>[LevelController]</color> ВСЕ УРОВНИ ПРОЙДЕНЫ!");
-                // TODO: показать финальный экран
+                Debug.Log("<color=cyan>[LevelController]</color> Все уровни пройдены! Возврат в главное меню");
+        
+                if (TransitionScreenManager.Instance != null)
+                {
+                    yield return TransitionScreenManager.Instance.FadeToBlack(() =>
+                    {
+                        SceneManager.LoadScene("MainMenu");
+                    });
+                }
+                else
+                {
+                    SceneManager.LoadScene("MainMenu");
+                }
             }
         }
 
@@ -328,6 +364,10 @@ namespace Core
 
             isGameOver = true;
             GameStateManager.Instance?.SetState(GameState.GameOver);
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.FadeVolume(dimmedVolumeMultiplier, musicFadeDuration);
+            }
 
             Debug.Log("<color=red>[LevelController]</color> Игрок погиб");
 

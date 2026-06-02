@@ -8,6 +8,7 @@ namespace Core.Tutorial
     {
         public string speakerName;
         [TextArea(3, 5)] public string text;
+        [TextArea(1, 2)] public string objective;
         public Sprite speakerAvatar;
 
         [Header("Interactivity")]
