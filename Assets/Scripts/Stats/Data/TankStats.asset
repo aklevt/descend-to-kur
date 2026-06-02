@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f35bc3a3345e9614e81a1e7e5bb3b60a, type: 3}
   m_Name: TankStats
   m_EditorClassIdentifier: GameScripts::Stats.EnemyStatsData
-  entityName: Tank
+  entityName: "\u041B\u0430\u043C\u0430\u0441\u0441\u0443"
   maxHealth: 30
   moveRange: 1
   baseAttackDamage: 7

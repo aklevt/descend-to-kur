@@ -15,6 +15,12 @@ namespace UI
 
         [SerializeField] private TextMeshProUGUI victoryTitle;
         [SerializeField] private Button victoryNextButton;
+        
+        [SerializeField] private CanvasGroup victoryContainerGroup;
+        [SerializeField] private RectTransform victoryLineRect;
+        [SerializeField] private float targetLineWidth = 400f; 
+        [SerializeField] private float elementsFadeDuration = 0.5f;
+        [SerializeField] private AnimationCurve lineBounceCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
 
         [Header("Defeat Screen")] [SerializeField]
         private GameObject defeatPanel;
@@ -79,14 +85,23 @@ namespace UI
             }
         }
 
-        public IEnumerator ShowVictoryScreen(string title = "ПОБЕДА!")
+        public IEnumerator ShowVictoryScreen(string title = "ПОБЕДА!", bool isLastRoom = false)
         {
             if (victoryPanel == null)
             {
                 yield break;
             }
-            
+    
             Core.GameStateManager.Instance?.SetState(Core.GameState.GameOver);
+            
+            if (victoryContainerGroup != null)
+            {
+                victoryContainerGroup.alpha = 0f;
+            }
+            if (victoryLineRect != null)
+            {
+                victoryLineRect.sizeDelta = new Vector2(0f, victoryLineRect.sizeDelta.y);
+            }
 
             victoryPanel.SetActive(true);
             if (victoryTitle != null)
@@ -97,17 +112,62 @@ namespace UI
                 victoryTitle.color = color;
             }
 
+            if (victoryNextButton != null)
+            {
+                var buttonText = victoryNextButton.GetComponentInChildren<TextMeshProUGUI>();
+                if (buttonText != null)
+                {
+                    buttonText.text = isLastRoom ? "В главное меню" : "Продолжить";
+                }
+            }
+
+            var elementsAnimRoutine = StartCoroutine(AnimateVictoryElements());
+
             yield return StartCoroutine(ChangeVignetteColorWithTextFade(victoryVignetteColor, victoryTitle));
 
             yield return StartCoroutine(WaitForVictoryButton());
 
+            if (elementsAnimRoutine != null) StopCoroutine(elementsAnimRoutine);
+
             yield return StartCoroutine(ChangeVignetteColorWithTextFade(Color.black, victoryTitle, false));
 
             HideVictoryScreen();
-            
+    
             Core.GameStateManager.Instance?.SetState(Core.GameState.Transition);
         }
 
+        private IEnumerator AnimateVictoryElements()
+        {
+            yield return new WaitForSeconds(0.3f);
+
+            var elapsed = 0f;
+            var initialSize = victoryLineRect != null ? victoryLineRect.sizeDelta : Vector2.zero;
+
+            while (elapsed < elementsFadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                var t = elapsed / elementsFadeDuration;
+
+                if (victoryContainerGroup != null)
+                {
+                    victoryContainerGroup.alpha = t;
+                }
+
+                if (victoryLineRect != null)
+                {
+                    var curveValue = lineBounceCurve.Evaluate(t);
+                    var currentWidth = curveValue * targetLineWidth;
+                    
+                    victoryLineRect.sizeDelta = new Vector2(currentWidth, initialSize.y);
+                }
+
+                yield return null;
+            }
+
+            if (victoryContainerGroup != null) victoryContainerGroup.alpha = 1f;
+            if (victoryLineRect != null) victoryLineRect.sizeDelta = new Vector2(targetLineWidth, initialSize.y);
+        }
+        
         public IEnumerator ShowDefeatScreen(string title = "ПОРАЖЕНИЕ!")
         {
             if (defeatPanel == null)

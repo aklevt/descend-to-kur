@@ -289,9 +289,14 @@ namespace Core
         {
             yield return new WaitForSeconds(1.5f);
 
+            var isLastRoom = currentRoomIndex >= roomPrefabs.Count - 1;
+
             if (TransitionScreenManager.Instance != null && currentRoom != null)
             {
-                yield return TransitionScreenManager.Instance.ShowVictoryScreen(currentRoom.VictoryMessage);
+                yield return TransitionScreenManager.Instance.ShowVictoryScreen(
+                    currentRoom.VictoryMessage, 
+                    isLastRoom
+                );
             }
 
             currentRoomIndex++;
@@ -314,8 +319,19 @@ namespace Core
             }
             else
             {
-                Debug.Log("<color=cyan>[LevelController]</color> ВСЕ УРОВНИ ПРОЙДЕНЫ!");
-                // TODO: показать финальный экран
+                Debug.Log("<color=cyan>[LevelController]</color> Все уровни пройдены! Возврат в главное меню");
+        
+                if (TransitionScreenManager.Instance != null)
+                {
+                    yield return TransitionScreenManager.Instance.FadeToBlack(() =>
+                    {
+                        SceneManager.LoadScene("MainMenu");
+                    });
+                }
+                else
+                {
+                    SceneManager.LoadScene("MainMenu");
+                }
             }
         }
 

@@ -37,7 +37,7 @@ namespace Core.Room
         [Header("Objective")] [SerializeField]
         private RoomObjectiveType objectiveType = RoomObjectiveType.KillAllEnemies;
 
-        [SerializeField] private string victoryMessage = "Комната пройдена";
+        [SerializeField] private string victoryMessage = "Уровень пройден!";
 
         public RoomObjectiveType ObjectiveType => objectiveType;
         public string VictoryMessage => victoryMessage;
