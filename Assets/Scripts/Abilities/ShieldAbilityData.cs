@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Entities;
 using UnityEngine;
@@ -15,8 +15,20 @@ namespace Abilities
         [SerializeField] private GameObject shieldEffectPrefab;
         [SerializeField] private float effectDuration = 0.5f;
         
-        [Header("Energy Freeze")] // ❗ Заготовка
+        [Header("Energy Freeze")]
         [SerializeField] private int freezeEnergyCost = 3; 
+        
+        private bool wasUsedThisTurn;
+
+        public override bool IsTurnLimitExceeded() => limitOncePerTurn && wasUsedThisTurn;
+        
+        public void ResetTurnLimit() => wasUsedThisTurn = false;
+        
+        public override bool CanUse(BaseEntity user)
+        {
+            if (IsTurnLimitExceeded()) return false;
+            return base.CanUse(user);
+        }
 
         public override List<Vector3Int> GetTargetCellsFrom(Vector3Int origin, BaseEntity actor)
         {
@@ -39,8 +51,10 @@ namespace Abilities
             {
                 yield break;
             }
+            
+            if (limitOncePerTurn) wasUsedThisTurn = true;
 
-            actor.Stats.ApplyShield(shieldDuration);
+            actor.Stats.SetShield(shieldDuration);
             actor.UpdateVisualStatus();
 
             yield return PlayShieldEffect(actor);

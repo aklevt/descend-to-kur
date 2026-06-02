@@ -1,9 +1,11 @@
 using Entities;
+using UI;
 using UnityEngine;
 
 public class HealZone : MonoBehaviour, ITileObject
 {
     [SerializeField] private int healAmount = 5;
+    public int HealAmount => healAmount;
 
     private bool wasCollected = false;
     private bool playerStandingOn = false;
@@ -21,6 +23,8 @@ public class HealZone : MonoBehaviour, ITileObject
             if (!player.IsPhysicallyDead())
             {
                 playerStandingOn = true;
+                UIController.Instance?.ShowPriorityWarning("У вас есть шанс спастись!",
+                    $"Нажмите [Пробел] или 'Завершение хода', чтобы подобрать +{healAmount} HP", 3f);
                 Debug.Log(
                     $"<color=yellow>[HealZone]</color> {player.name} стоит на хилке. Нажмите 'Завершить ход' чтобы подобрать (+{healAmount} HP). " +
                     $"❗ Это надо переместить в PopUp-канал сообщений");

@@ -13,13 +13,22 @@ MonoBehaviour:
   m_Name: StunAbility
   m_EditorClassIdentifier: GameScripts::Abilities.StunAbilityData
   abilityName: "\u041E\u0433\u043B\u0443\u0448\u0435\u043D\u0438\u0435"
-  energyCost: 6
+  displayMinRange: 2
+  displayRange: -1
+  description: 
+  energyCost: 4
   bonusDamage: 0
-  overrideBaseDamage: 0
+  overrideBaseDamage: 1
   highlightColor: {r: 1, g: 0, b: 0.6606407, a: 1}
   effectColor: {r: 0.6348882, g: 0, b: 1, a: 0.9}
+  forceProceduralPunch: 0
+  useDiagonalPunch: 0
+  limitOncePerTurn: 1
   minRange: 2
   maxRange: 4
   stunDuration: 2
+  chainProjectilePrefab: {fileID: 3004488144075951647, guid: 05c68ecd8d31633448a2fb7a776838c0, type: 3}
+  projectileSpeed: 3.5
+  arcHeight: 1.5
   stunEffectPrefab: {fileID: 0}
   effectDuration: 0.3

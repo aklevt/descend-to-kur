@@ -5,5 +5,6 @@ namespace UI.Dialogue
         Subtitle,      // Субтитры внизу (для интро)
         InGame,        // Компактный диалог внизу (игровой)
         Fullscreen,    // Полноэкранный с портретом
+        Cinematic
     }
 }

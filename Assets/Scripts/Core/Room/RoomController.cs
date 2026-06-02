@@ -37,7 +37,7 @@ namespace Core.Room
         [Header("Objective")] [SerializeField]
         private RoomObjectiveType objectiveType = RoomObjectiveType.KillAllEnemies;
 
-        [SerializeField] private string victoryMessage = "Комната пройдена";
+        [SerializeField] private string victoryMessage = "Уровень пройден!";
 
         public RoomObjectiveType ObjectiveType => objectiveType;
         public string VictoryMessage => victoryMessage;
@@ -46,7 +46,7 @@ namespace Core.Room
 
         public event Action OnRoomCleared;
         public event Action<Bounds> OnCameraBoundsChanged;
-
+        
         private List<EnemyBase> enemiesInRoom = new();
         private List<RoomDialogueTrigger> dialogueTriggers = new();
         private SectionManager sectionManager;
@@ -351,10 +351,25 @@ namespace Core.Room
 
         private void CompleteRoom()
         {
+            if (isCleared) return;
             isCleared = true;
             Debug.Log($"<color=green>[RoomController]</color> Цели комнаты выполнены");
+    
+            StartCoroutine(CompleteRoomSequence());
+        }
+        
+        /// <summary>
+        /// Последовательность завершения комнаты: диалоги, событие победы
+        /// </summary>
+        private IEnumerator CompleteRoomSequence()
+        {
+            yield return TriggerDialoguesOfTypeSequential(DialogueTriggerType.OnRoomCleared);
+    
+            Debug.Log($"<color=green>[RoomController]</color> Диалоги завершены, переход к экрану победы");
+    
             OnRoomCleared?.Invoke();
         }
+
 
         #endregion
 
@@ -369,7 +384,8 @@ namespace Core.Room
             foreach (var trigger in dialoguesOfType)
             {
                 Debug.Log($"<color=yellow>[RoomController]</color> Запуск диалога: {trigger.DialogueData?.name}");
-                trigger.TriggerDialogue();
+                
+                yield return trigger.TriggerDialogueRoutine();
 
                 yield return new WaitUntil(() =>
                     DialogueManager.Instance == null || !DialogueManager.Instance.IsDialogueActive);
@@ -413,6 +429,17 @@ namespace Core.Room
             return enemiesInRoom
                 .Where(e => e != null && e.Stats != null && !e.Stats.IsDead)
                 .ToList();
+        }
+        
+        /// <summary>
+        /// Принудительное завершение комнаты (для пустых секций)
+        /// </summary>
+        public void ForceComplete()
+        {
+            if (isCleared) return;
+    
+            Debug.Log("<color=green>[RoomController]</color> Принудительное завершение комнаты (пустая секция)");
+            CompleteRoom();
         }
     }
 

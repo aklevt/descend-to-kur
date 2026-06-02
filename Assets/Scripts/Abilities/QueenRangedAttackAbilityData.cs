@@ -1,4 +1,4 @@
-// --- FILE: Assets/Scripts/Abilities/QueenRangedAttackAbilityData.cs ---
+﻿// --- FILE: Assets/Scripts/Abilities/QueenRangedAttackAbilityData.cs ---
 
 using System.Collections;
 using System.Collections.Generic;
@@ -58,9 +58,10 @@ namespace Abilities
 
                     if (step >= minRange)
                         result.Add(cell);
-
-                    if (GridManager.Instance.GetEntityAt(cell) != null)
-                        break;
+                    
+                    // Может стрелять сквозь сущности
+                    // if (GridManager.Instance.GetEntityAt(cell) != null)
+                    //     break;
                 }
             }
 

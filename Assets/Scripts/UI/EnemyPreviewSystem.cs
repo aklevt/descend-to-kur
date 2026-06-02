@@ -1,4 +1,5 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Abilities;
 using Entities;
 using UnityEngine;
@@ -58,7 +59,9 @@ namespace Core
             if (health != null) health.OnDeath += HandleCurrentEnemyDied;
 
             GridHighlighter.Instance?.DimPlayerHighlights();
-
+            
+            Core.Tutorial.TutorialManager.Instance?.NotifyEnemyHovered();
+            
             if (showMove) ShowMovePreview(enemy);
             else ShowAttackPreview(enemy);
 
@@ -115,6 +118,8 @@ namespace Core
 
         private void ShowMovePreview(EnemyBase enemy)
         {
+            Core.Tutorial.TutorialManager.Instance?.NotifyEnemyAltHovered();
+            
             var range = enemy.Stats.MoveRange;
             if (range <= 0)
             {
@@ -161,7 +166,10 @@ namespace Core
             var ability = enemy.Abilities[0];
 
             var theoretical = ability.GetTheoreticalCellsFrom(enemy.CurrentCell, enemy);
-            var reachable = ability.GetTargetCellsFrom(enemy.CurrentCell, enemy);
+            var reachable = ability
+                .GetTargetCellsFrom(enemy.CurrentCell, enemy)
+                .SelectMany(x => ability.GetEffectCells(x, enemy))
+                .ToList();
 
             var reachableSet = new HashSet<Vector3Int>(reachable);
             var faded = new List<Vector3Int>();

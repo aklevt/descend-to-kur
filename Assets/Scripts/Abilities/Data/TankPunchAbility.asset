@@ -13,10 +13,16 @@ MonoBehaviour:
   m_Name: TankPunchAbility
   m_EditorClassIdentifier: GameScripts::Abilities.TankPunchAbilityData
   abilityName: 
+  displayMinRange: 0
+  displayRange: -1
+  description: 
   energyCost: 0
   bonusDamage: 0
   overrideBaseDamage: 0
   highlightColor: {r: 1, g: 1, b: 1, a: 1}
   effectColor: {r: 1, g: 0.2, b: 0.2, a: 0.9}
+  forceProceduralPunch: 0
+  useDiagonalPunch: 0
+  limitOncePerTurn: 0
   knockbackDistance: 2
-  impactPause: 0.1
+  impactPause: 0.15

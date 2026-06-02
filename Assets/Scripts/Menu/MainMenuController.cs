@@ -10,26 +10,19 @@ namespace UI.Menu
         [Header("Buttons")]
         [SerializeField] private Button continueButton;
         [SerializeField] private Button newGameButton;
-        // [SerializeField] private Button settingsButton;
         [SerializeField] private Button exitButton;
-
-        [Header("Panels")]
-        [SerializeField] private GameObject settingsPanel;
-
-        [Header("Settings")]
-        [SerializeField] private string gameplaySceneName = "Gameplay";
-
+        
+        [Header("Intro")]
+        [SerializeField] private SimpleIntroPanel introPanel;
+        [SerializeField] private IntroData fallbackIntroData;
+        
         private void Start()
         {
             continueButton.onClick.AddListener(OnContinue);
             newGameButton.onClick.AddListener(OnNewGame);
-            // settingsButton.onClick.AddListener(OnSettings);
             exitButton.onClick.AddListener(OnExit);
 
             UpdateContinueButton();
-            
-            if (settingsPanel != null)
-                settingsPanel.SetActive(false);
         }
 
         private void UpdateContinueButton()
@@ -47,7 +40,6 @@ namespace UI.Menu
             }
 
             SaveSystem.LoadGame();
-            
             LoadGameplayScene();
         }
 
@@ -58,12 +50,6 @@ namespace UI.Menu
             
             LoadGameplayScene();
         }
-
-        // private void OnSettings()
-        // {
-        //     if (settingsPanel != null)
-        //         settingsPanel.SetActive(true);
-        // }
 
         private void OnExit()
         {
@@ -76,13 +62,16 @@ namespace UI.Menu
 
         private void LoadGameplayScene()
         {
-            SceneManager.LoadScene(gameplaySceneName);
-        }
-
-        public void CloseSettings()
-        {
-            if (settingsPanel != null)
-                settingsPanel.SetActive(false);
+            var sceneName = "SampleScene";
+    
+            if (Core.SceneTransitioner.Instance != null)
+            {
+                Core.SceneTransitioner.Instance.SwitchScene(sceneName);
+            }
+            else
+            {
+                SceneManager.LoadScene(sceneName);
+            }
         }
     }
 }

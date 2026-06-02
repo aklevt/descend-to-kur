@@ -1,3 +1,4 @@
+using System.Collections;
 using UI.Dialogue;
 using UnityEngine;
 
@@ -31,39 +32,42 @@ namespace Core.Room
         {
             hasPlayed = false;
 
-            if (triggerType == DialogueTriggerType.OnRoomCleared && parentRoom != null)
-            {
-                parentRoom.OnRoomCleared += TriggerDialogue;
-            }
+            // if (triggerType == DialogueTriggerType.OnRoomCleared && parentRoom != null)
+            // {
+            //     parentRoom.OnRoomCleared += TriggerDialogue;
+            // }
         }
 
         public void Cleanup()
         {
-            if (parentRoom != null)
-            {
-                parentRoom.OnRoomCleared -= TriggerDialogue;
-            }
+            // if (parentRoom != null)
+            // {
+            //     parentRoom.OnRoomCleared -= TriggerDialogue;
+            // }
         }
 
-        public void TriggerDialogue()
+        public IEnumerator TriggerDialogueRoutine()
         {
-            if (playOnce && hasPlayed) return;
-            if (dialogueData == null) return;
+            if (playOnce && hasPlayed) yield break;
+            if (dialogueData == null) yield break;
             
             if (dialogueData.showOnlyOnce && DialogueProgress.IsCompleted(dialogueData.DialogueID))
             {
-                return;
+                yield break;
             }
 
             hasPlayed = true;
             
             if (delayBefore > 0f)
             {
-                StartCoroutine(DelayedStart());
+                yield return new WaitForSeconds(delayBefore);
             }
-            else
+
+            if (DialogueManager.Instance != null)
             {
-                DialogueManager.Instance?.StartDialogue(dialogueData);
+                DialogueManager.Instance.StartDialogue(dialogueData);
+                
+                yield return new WaitUntil(() => DialogueManager.Instance.IsDialogueActive);
             }
         }
 

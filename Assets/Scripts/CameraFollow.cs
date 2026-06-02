@@ -25,10 +25,15 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] private bool smoothFollow = true;
     [SerializeField] private float uiYOffset = -1.5f;
 
-    [Header("Free Look Settings")] [SerializeField]
-    private float freeLookSpeed = 5f;
+    [Header("Tutorial Adaptive Settings")]
+    [Tooltip("Текущий горизонтальный сдвиг центра из-за активного UI туториала")]
+    private float tutorialXOffset = 0f;
 
-    [Header("Zoom Settings")] private Vector3 focusOffset;
+    [Header("Free Look Settings")] 
+    [SerializeField] private float freeLookSpeed = 5f;
+
+    [Header("Zoom Settings")] 
+    private Vector3 focusOffset;
     private Vector3 shakeOffset;
 
     private bool isDetached;
@@ -56,7 +61,6 @@ public class CameraFollow : MonoBehaviour
                     Debug.LogError("[CameraFollow] MainCamera не найдена");
                 }
             }
-
             return mainCamera;
         }
     }
@@ -112,7 +116,7 @@ public class CameraFollow : MonoBehaviour
         }
         else
         {
-            var finalOffset = offset + focusOffset + new Vector3(0, uiYOffset, 0);
+            var finalOffset = offset + focusOffset + new Vector3(tutorialXOffset, uiYOffset, 0);
             targetPos = currentTarget.position + finalOffset;
         }
 
@@ -130,6 +134,18 @@ public class CameraFollow : MonoBehaviour
     }
 
     #region PUBLIC API
+
+    /// <summary>
+    /// Устанавливает смещение центра экрана
+    /// </summary>
+    public void SetTutorialOffset(float xOffset)
+    {
+        tutorialXOffset = xOffset;
+        if (hasBounds)
+        {
+            UpdateBoundsWithCurrentZoom(tilemapBounds);
+        }
+    }
 
     /// <summary>
     /// Установить цель для камеры
@@ -305,35 +321,35 @@ public class CameraFollow : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Обновить границы с учётом текущего зума
-    /// </summary>
-    private void UpdateBoundsWithCurrentZoom(Bounds tilemapBounds)
+    private void UpdateBoundsWithCurrentZoom(Bounds currentTilemapBounds)
     {
-        var cameraHeight = mainCamera.orthographicSize * 2f;
-        var cameraWidth = cameraHeight * mainCamera.aspect;
+        var cameraHeight = MainCamera.orthographicSize * 2f;
+        var cameraWidth = cameraHeight * MainCamera.aspect;
 
+        // Корректируем жесткие лимиты на основе текущего tutorialXOffset.
+        // Если центр смещен вправо (оффсет положительный), левая граница должна сдвинуться вглубь уровня,
+        // чтобы камера не уезжала за пределы тайлмапа слева.
         minBounds = new Vector3(
-            tilemapBounds.min.x + cameraWidth / 2f,
-            tilemapBounds.min.y + cameraHeight / 2f,
+            currentTilemapBounds.min.x + (cameraWidth / 2f) + tutorialXOffset,
+            currentTilemapBounds.min.y + cameraHeight / 2f,
             offset.z
         );
 
         maxBounds = new Vector3(
-            tilemapBounds.max.x - cameraWidth / 2f,
-            tilemapBounds.max.y - cameraHeight / 2f,
+            currentTilemapBounds.max.x - (cameraWidth / 2f) + tutorialXOffset,
+            currentTilemapBounds.max.y - cameraHeight / 2f,
             offset.z
         );
 
         if (minBounds.x > maxBounds.x)
         {
-            var center = (tilemapBounds.min.x + tilemapBounds.max.x) / 2f;
-            minBounds.x = maxBounds.x = center;
+            var center = (currentTilemapBounds.min.x + currentTilemapBounds.max.x) / 2f;
+            minBounds.x = maxBounds.x = center + tutorialXOffset;
         }
 
         if (minBounds.y > maxBounds.y)
         {
-            var center = (tilemapBounds.min.y + tilemapBounds.max.y) / 2f;
+            var center = (currentTilemapBounds.min.y + currentTilemapBounds.max.y) / 2f;
             minBounds.y = maxBounds.y = center;
         }
 
@@ -344,7 +360,7 @@ public class CameraFollow : MonoBehaviour
     {
         if (currentTarget == null) return;
 
-        var finalOffset = offset + focusOffset + new Vector3(0, uiYOffset, 0);
+        var finalOffset = offset + focusOffset + new Vector3(tutorialXOffset, uiYOffset, 0);
         var targetPosition = currentTarget.position + finalOffset;
 
         if (hasBounds)
@@ -353,14 +369,10 @@ public class CameraFollow : MonoBehaviour
             targetPosition.y = Mathf.Clamp(targetPosition.y, minBounds.y, maxBounds.y);
         }
 
-        // Мгновенная телепортация
         transform.position = targetPosition;
         Debug.Log($"<color=cyan>[CameraFollow]</color> SnapToTarget на позицию: {transform.position}");
     }
     
-    /// <summary>
-    /// Получить базовые границы комнаты (для использования в секциях)
-    /// </summary>
     public Bounds GetRoomBounds()
     {
         return tilemapBounds;

@@ -1,3 +1,4 @@
+using Entities;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -15,14 +16,30 @@ namespace Core
         private float previewHoverTimer;
         private bool previewShown;
         
+        private Vector2 lastMousePosition;
+        private const float MouseMovementThreshold = 5f;
+        
         private void Awake()
         {
             mainCamera = Camera.main;
         }
 
+        private void Start()
+        {
+            if (Mouse.current != null)
+            {
+                lastMousePosition = Mouse.current.position.ReadValue();
+            }
+        }
+
         private void Update()
         {
             if (!Application.isFocused) return;
+
+            if (CheckPriorityWarningInput())
+            {
+                // return;
+            }
             
             HandleSystemInput();
             
@@ -47,6 +64,39 @@ namespace Core
                 case GameState.Transition:
                     break;
             }
+        }
+        
+        private bool CheckPriorityWarningInput()
+        {
+            if (UI.UIController.Instance?.IsPriorityWarningActive != true)
+                return false;
+
+            if (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame)
+            {
+                UI.UIController.Instance.DismissPriorityWarning();
+                return true;
+            }
+
+            if (Mouse.current != null)
+            {
+                var currentMousePos = Mouse.current.position.ReadValue();
+                var delta = Vector2.Distance(currentMousePos, lastMousePosition);
+
+                if (delta > MouseMovementThreshold)
+                {
+                    lastMousePosition = currentMousePos;
+                    UI.UIController.Instance.DismissPriorityWarning();
+                    return true;
+                }
+            }
+
+            if (Mouse.current != null && (Mouse.current.leftButton.wasPressedThisFrame || Mouse.current.rightButton.wasPressedThisFrame))
+            {
+                UI.UIController.Instance.DismissPriorityWarning();
+                return true;
+            }
+
+            return true;
         }
         
         /// <summary>
@@ -97,6 +147,11 @@ namespace Core
             HandleAbilityHotkeys();
             HandleEndTurnInput();
             HandleMouseInput();
+            
+            if (Mouse.current != null)
+            {
+                lastMousePosition = Mouse.current.position.ReadValue();
+            }
             
             if (AbilityController.Instance?.ConsumeHoverUpdateRequest() == true)
             {
@@ -212,14 +267,45 @@ namespace Core
             {
                 lastHoveredCell = hoveredCell;
                 AbilityController.Instance.HandleCellHover(hoveredCell);
+                HandleEnemyInfoHover(hoveredCell);
             }
         }
+        
+        private void HandleEnemyInfoHover(Vector3Int hoveredCell)
+        {
+            var entity = GridManager.Instance?.GetEntityAt(hoveredCell);
+            
+            if (entity != null)
+            {
+                var enemyBase = entity.GetComponent<Entities.EnemyBase>();
+                if (enemyBase != null)
+                {
+                    UI.HUD.EnemyInfoManager.Instance?.OnEnemyHover(entity);
+                    
+                    
+                    return;
+                }
+            }
+            
+            UI.HUD.EnemyInfoManager.Instance?.OnHoverEnd();
+        }
+
         
         /// <summary>
         /// При нажатии/отпускании Alt обновляет превью
         /// </summary>
         private void HandleAltToggle()
         {
+            if (!CanShowPreview())
+            {
+                if (lastAltState)
+                {
+                    lastAltState = false;
+                    EnemyPreviewSystem.Instance?.RefreshPreview(false);
+                }
+                return;
+            }
+            
             var kb = Keyboard.current;
             if (kb == null) return;
 
@@ -237,6 +323,17 @@ namespace Core
         /// </summary>
         private void UpdateEnemyPreview()
         {
+            if (!CanShowPreview())
+            {
+                if (previewShown)
+                {
+                    EnemyPreviewSystem.Instance?.HidePreview();
+                    previewShown = false;
+                }
+                previewHoverTimer = 0f;
+                return;
+            }
+            
             if (Mouse.current == null) return;
 
             var mousePos = Mouse.current.position.ReadValue();
@@ -275,6 +372,7 @@ namespace Core
             if (previewHoverTimer < PreviewHoverDelay) return;
 
             var shown = EnemyPreviewSystem.Instance?.TryShowPreview(hoveredCell, altHeld) ?? false;
+
             previewShown = shown;
 
             if (!shown)
@@ -282,11 +380,21 @@ namespace Core
                 previewHoverTimer = 0f;
             }
         }
+        
+        private bool CanShowPreview()
+        {
+            if (!IsPlayerTurn()) return false;
+
+            if (PlayerMovement.Instance != null && PlayerMovement.Instance.IsMoving) return false;
+            
+            if (AbilityController.Instance != null && AbilityController.Instance.IsExecuting) return false;
+
+            return true;
+        }
 
         /// <summary>
         /// Показывает превью зоны врага при наведении
         /// </summary>
-        
         private Vector2 GetCameraMovementInput()
         {
             var kb = Keyboard.current;

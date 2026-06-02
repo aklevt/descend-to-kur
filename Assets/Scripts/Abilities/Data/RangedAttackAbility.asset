@@ -13,14 +13,19 @@ MonoBehaviour:
   m_Name: RangedAttackAbility
   m_EditorClassIdentifier: GameScripts::Abilities.RangedAttackAbilityData
   abilityName: "\u0414\u0430\u043B\u044C\u043D\u044F\u044F"
+  displayMinRange: 3
+  displayRange: -1
+  description: 
   energyCost: 5
   bonusDamage: 0
   overrideBaseDamage: 0
   highlightColor: {r: 0.6862745, g: 0, b: 0, a: 1}
   effectColor: {r: 1, g: 0.2, b: 0.2, a: 0.9}
-  minRange: 2
-  maxRange: 3
+  forceProceduralPunch: 0
+  useDiagonalPunch: 0
+  limitOncePerTurn: 0
+  minRange: 3
+  maxRange: 5
   projectilePrefab: {fileID: 2925020745135665912, guid: e945ce1183cf6ae4f9109d6da1d9f38f, type: 3}
-  projectileSpeed: 10
   chargeEffectPrefab: {fileID: 4494311070640868934, guid: 1ddf84f6e6fcb464f99ce0afd16e5ab0, type: 3}
   chargeTime: 0.3

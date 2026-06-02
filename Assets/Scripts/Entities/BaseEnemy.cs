@@ -15,6 +15,12 @@ namespace Entities
     public abstract class EnemyBase : BaseEntity
     {
         private IEnemyAI enemyAI;
+        
+        [Header("Distance Speed Scaling")]
+        [Tooltip("Дистанция в клетках, начиная с которой враг считается далеким и ускоряется")]
+        [SerializeField] private int farDistanceThreshold = 8;
+        [Tooltip("Множитель скорости, если враг находится далеко")]
+        [SerializeField] private float catchUpSpeedMultiplier = 4f;
 
         #region Initialization
 
@@ -41,6 +47,9 @@ namespace Entities
         {
             if (Abilities.Count > 0)
             {
+                if (Abilities[0] is TankPunchAbilityData)
+                    return new TankEnemyAI();
+                
                 if (Abilities[0] is QueenRangedAttackAbilityData)
                     return new QueenRangedEnemyAI();
 
@@ -142,5 +151,24 @@ namespace Entities
         protected abstract IEnumerator ExecuteAction();
 
         #endregion
+        
+        public override float GetAnimationSpeedMultiplier()
+        {
+            var baseMultiplier = base.GetAnimationSpeedMultiplier();
+
+            if (PlayerMovement.Instance == null) 
+                return baseMultiplier;
+
+            var offset = PlayerMovement.Instance.transform.position - transform.position;
+    
+            var sqrDistance = offset.sqrMagnitude; 
+
+            if (sqrDistance >= (farDistanceThreshold * farDistanceThreshold))
+            {
+                return baseMultiplier * catchUpSpeedMultiplier;
+            }
+
+            return baseMultiplier;
+        }
     }
 }

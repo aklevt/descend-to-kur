@@ -9,6 +9,7 @@ namespace UI.Dialogue
     {
         [Header("UI Elements")]
         [SerializeField] private CanvasGroup dialoguePanel;
+        [SerializeField] private Image speakerNameBackground;
         [SerializeField] private TextMeshProUGUI speakerNameText;
         [SerializeField] private TextMeshProUGUI dialogueText;
         [SerializeField] private GameObject continueIndicator;
@@ -27,13 +28,18 @@ namespace UI.Dialogue
         protected override void SetupInputListeners()
         {
             if (clickCatcherButton != null)
-                clickCatcherButton.onClick.AddListener(OnInputPressed);
+                clickCatcherButton.onClick.AddListener(HandleClick);
         }
 
         protected override void CleanupInputListeners()
         {
             if (clickCatcherButton != null)
-                clickCatcherButton.onClick.RemoveListener(OnInputPressed);
+                clickCatcherButton.onClick.RemoveListener(HandleClick);
+        }
+
+        private void HandleClick()
+        {
+            DialogueManager.Instance?.AdvanceDialogue();
         }
 
         protected override void ClearUI()
@@ -47,7 +53,11 @@ namespace UI.Dialogue
             if (speakerNameText != null)
             {
                 speakerNameText.text = "";
-                speakerNameText.gameObject.SetActive(false);
+            }
+
+            if (speakerNameBackground != null)
+            {
+                speakerNameBackground.gameObject.SetActive(false);
             }
 
             if (continueIndicator != null)
@@ -111,7 +121,23 @@ namespace UI.Dialogue
 
         private void SetupSpeakerName(string speakerName)
         {
-            if (speakerNameText != null)
+            if (speakerNameBackground != null)
+            {
+                if (string.IsNullOrEmpty(speakerName))
+                {
+                    speakerNameBackground.gameObject.SetActive(false);
+                }
+                else
+                {
+                    speakerNameBackground.gameObject.SetActive(true);
+                    
+                    if (speakerNameText != null)
+                    {
+                        speakerNameText.text = speakerName;
+                    }
+                }
+            }
+            else if (speakerNameText != null)
             {
                 if (string.IsNullOrEmpty(speakerName))
                 {

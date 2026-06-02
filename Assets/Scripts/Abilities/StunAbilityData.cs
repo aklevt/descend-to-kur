@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Entities;
 using FX;
@@ -9,16 +9,38 @@ namespace Abilities
     [CreateAssetMenu(fileName = "StunAbility", menuName = "Abilities/Stun")]
     public class StunAbilityData : AbilityData
     {
-        [Header("Range Settings")]
-        public int minRange = 2;
+        [Header("Range Settings")] public int minRange = 2;
         public int maxRange = 4;
-        
-        [Header("Stun Settings")]
-        [SerializeField] private int stunDuration = 2;
-        
-        [Header("Visual Effects")]
-        [SerializeField] private GameObject stunEffectPrefab;
+
+        [Header("Stun Settings")] [SerializeField]
+        private int stunDuration = 2;
+
+        [Header("Visual Effects")] [Tooltip("Префаб летящего снаряда")] [SerializeField]
+        private GameObject chainProjectilePrefab;
+
+        [Tooltip("Скорость полета снаряда")] [SerializeField]
+        private float projectileSpeed = 15f;
+
+        [Tooltip("Высота дуги полета (0 - летит прямо)")] [SerializeField]
+        private float arcHeight = 2f;
+
+        [Space] [SerializeField] private GameObject stunEffectPrefab;
         [SerializeField] private float effectDuration = 0.3f;
+
+        private HashSet<GameObject> stunnedGameObjectsThisTurn = new();
+
+        public void ResetTurnLimit() => stunnedGameObjectsThisTurn.Clear();
+
+        public bool IsTargetAlreadyStunned(Vector3Int cell)
+        {
+            var targetObj = GridManager.Instance.GetEntityAt(cell);
+            if (targetObj != null && limitOncePerTurn)
+            {
+                return stunnedGameObjectsThisTurn.Contains(targetObj);
+            }
+
+            return false;
+        }
 
         public override List<Vector3Int> GetTargetCellsFrom(Vector3Int origin, BaseEntity actor)
         {
@@ -27,11 +49,9 @@ namespace Abilities
 
             foreach (var cell in allCells)
             {
-                if (!GridManager.Instance.IsCellShootable(cell))
-                    continue;
-
-                if (!GridManager.Instance.HasLineOfSight(origin, cell))
-                    continue;
+                if (!GridManager.Instance.IsCellShootable(cell)) continue;
+                if (!GridManager.Instance.HasLineOfSight(origin, cell)) continue;
+                if (IsTargetAlreadyStunned(cell)) continue;
 
                 targetableCells.Add(cell);
             }
@@ -39,83 +59,138 @@ namespace Abilities
             return targetableCells;
         }
 
-        public override List<Vector3Int> GetEffectCells(Vector3Int hoveredCell, BaseEntity actor)
-        {
-            return new List<Vector3Int> { hoveredCell };
-        }
-
         public override bool IsValidTarget(Vector3Int targetCell, BaseEntity caster)
         {
-            var target = GridManager.Instance.GetEntityAt(targetCell);
-            return target != null && target != caster.gameObject;
+            var targetObj = GridManager.Instance.GetEntityAt(targetCell);
+            if (targetObj == null || targetObj == caster.gameObject) return false;
+            if (IsTargetAlreadyStunned(targetCell)) return false;
+
+            return true;
         }
 
-        public override Vector3Int? ChooseTarget(BaseEntity actor)
+        public override IEnumerator Execute(BaseEntity actor, Vector3Int targetCell)
         {
-            var playerCell = PlayerMovement.Instance?.CurrentCell;
-            if (playerCell == null) return null;
+            var targetObj = GridManager.Instance.GetEntityAt(targetCell);
+            if (targetObj == null) yield break;
 
-            var available = GetTargetCells(actor);
-            return available.Contains(playerCell.Value) ? playerCell : null;
+            var targetEntity = targetObj.GetComponent<BaseEntity>();
+            if (targetEntity == null) yield break;
+
+            if (limitOncePerTurn)
+            {
+                stunnedGameObjectsThisTurn.Add(targetObj);
+            }
+
+            var targetPos = targetObj.transform.position + new Vector3(0, 0.5f, 0);
+            actor.FlipToTarget(targetPos);
+
+            // Анимация
+            yield return actor.StartCoroutine(actor.PerformCast("RangedAttack", null));
+
+            var spawnPos = actor.GetProjectileSpawnPosition();
+
+            yield return PlayStunEffect(spawnPos, targetPos, actor);
+
+            targetEntity.Freeze(stunDuration);
         }
+
+        public override List<Vector3Int> GetEffectCells(Vector3Int hoveredCell, BaseEntity actor) =>
+            new() { hoveredCell };
+
+        public override Vector3Int? ChooseTarget(BaseEntity actor) => null;
 
         public override List<Vector3Int> GetTheoreticalCellsFrom(Vector3Int origin, BaseEntity actor)
         {
             var result = new List<Vector3Int>();
-
             for (var dx = -maxRange; dx <= maxRange; dx++)
             for (var dy = -maxRange; dy <= maxRange; dy++)
             {
                 var manh = Mathf.Abs(dx) + Mathf.Abs(dy);
                 if (manh < minRange || manh > maxRange) continue;
-
                 var cell = new Vector3Int(origin.x + dx, origin.y + dy, origin.z);
                 if (!GridManager.Instance.HasFloor(cell)) continue;
-
                 result.Add(cell);
             }
 
             return result;
         }
 
-        public override IEnumerator Execute(BaseEntity actor, Vector3Int targetCell)
+        private IEnumerator PlayStunEffect(Vector3 startPos, Vector3 endPos, BaseEntity actor)
         {
-            var targetObj = GridManager.Instance.GetEntityAt(targetCell);
-            if (targetObj == null) 
+            if (chainProjectilePrefab != null)
             {
-                yield break;
-            }
+                var projectile = Instantiate(chainProjectilePrefab, startPos, Quaternion.identity);
 
-            var targetEntity = targetObj.GetComponent<BaseEntity>();
-            if (targetEntity == null)
-            {
-                yield break;
-            }
+                var distance = Vector3.Distance(startPos, endPos);
+                var duration = distance / projectileSpeed;
+                var time = 0f;
+                var lastPos = startPos;
+                var originalScale = projectile.transform.localScale;
 
-            var targetPos = targetObj.transform.position + new Vector3(0, 0.5f, 0);
-            actor.FlipToTarget(targetPos);
+                // Полет цепи по дуге
+                while (time < duration)
+                {
+                    if (projectile == null) break;
 
-            yield return new WaitForSeconds(actor.GetScaledTime(0.1f));
+                    time += Time.deltaTime * actor.GetAnimationSpeedMultiplier();
+                    var linearProgress = time / duration;
 
-            targetEntity.Freeze(stunDuration);
-            
-            yield return PlayStunEffect(targetPos, actor);
-            
-            Debug.Log($"<color=purple>[StunAbility]</color> {targetEntity.name} оглушен на {stunDuration} ходов");
-        }
+                    var currentPos = Vector3.Lerp(startPos, endPos, linearProgress);
+                    var arcOffset = Mathf.Sin(linearProgress * Mathf.PI) * arcHeight;
+                    currentPos.y += arcOffset;
 
-        private IEnumerator PlayStunEffect(Vector3 targetPos, BaseEntity actor)
-        {
-            if (stunEffectPrefab != null)
-            {
-                var effect = Instantiate(stunEffectPrefab, targetPos, Quaternion.identity);
-                yield return new WaitForSeconds(actor.GetScaledTime(effectDuration));
-                if (effect != null)
-                    Destroy(effect);
+                    var direction = currentPos - lastPos;
+                    if (direction != Vector3.zero)
+                    {
+                        var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                        projectile.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+                    }
+
+                    projectile.transform.position = currentPos;
+                    lastPos = currentPos;
+
+                    yield return null;
+                }
+
+                if (projectile != null)
+                {
+                    projectile.transform.position = endPos;
+                    var hitTime = 0f;
+                    var hitDuration = 0.1f;
+
+                    var spriteRenderer = projectile.GetComponentInChildren<SpriteRenderer>();
+
+                    while (hitTime < hitDuration)
+                    {
+                        if (projectile == null) break;
+                        hitTime += Time.deltaTime;
+                        var p = hitTime / hitDuration;
+
+                        projectile.transform.localScale = Vector3.Lerp(originalScale, originalScale * 2.5f, p);
+
+                        if (spriteRenderer != null)
+                        {
+                            var c = spriteRenderer.color;
+                            c.a = Mathf.Lerp(1f, 0f, p);
+                            spriteRenderer.color = c;
+                        }
+
+                        yield return null;
+                    }
+
+                    Destroy(projectile);
+                }
             }
             else
             {
                 yield return new WaitForSeconds(actor.GetScaledTime(0.1f));
+            }
+
+            if (stunEffectPrefab != null)
+            {
+                var effect = Instantiate(stunEffectPrefab, endPos, Quaternion.identity);
+                yield return new WaitForSeconds(actor.GetScaledTime(effectDuration));
+                if (effect != null) Destroy(effect);
             }
         }
     }

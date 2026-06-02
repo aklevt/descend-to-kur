@@ -1,5 +1,6 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Entities;
 using UnityEngine;
 
@@ -100,8 +101,15 @@ namespace Abilities
 
         private void KnobackEnemy(Vector3Int direction, BaseEntity entity)
         {
-            var cell1 = entity.CurrentCell + direction;
-            var cell2 = entity.CurrentCell + 2 * direction;
+            var normalizedDir = new Vector3Int(
+                System.Math.Sign(direction.x),
+                System.Math.Sign(direction.y),
+                0
+            );
+
+            
+            var cell1 = entity.CurrentCell + normalizedDir;
+            var cell2 = entity.CurrentCell + 2 * normalizedDir;
     
             if (!GridManager.Instance.IsCellKnockbackable(cell1))
             {
@@ -127,6 +135,18 @@ namespace Abilities
             }
     
             entity.MoveDirectly(cell2);
+        }
+
+        public override List<Vector3Int> GetTheoreticalCellsFrom(Vector3Int position, BaseEntity actor)
+        {
+            var dirs = new List<Vector3Int>()
+            {
+                Vector3Int.up,
+                Vector3Int.down,
+                Vector3Int.left,
+                Vector3Int.right,
+            };
+            return dirs.SelectMany(x => GetEffectCells(x, actor)).ToList(); 
         }
     }
 }

@@ -42,6 +42,9 @@ namespace UI.HUD
             if (energyText != null) 
                 energyText.text = $"{stats.Energy}/{stats.MaxEnergy}";
             
+            var maxSteps = stats.MaxStepsPerRound;
+            var actualSteps = Mathf.Min(stats.RemainingSteps, stats.Energy);
+            
             if (stepsText != null) 
             {
                 if (stats.RemainingSteps != lastSteps)
@@ -56,8 +59,8 @@ namespace UI.HUD
             
             if (stepsSlider != null)
             {
-                stepsSlider.maxValue = stats.MaxStepsPerRound;
-                stepsSlider.value = stats.RemainingSteps;
+                stepsSlider.maxValue = maxSteps;
+                stepsSlider.value = actualSteps;
             }
         }
     }

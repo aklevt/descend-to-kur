@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -6,7 +6,7 @@ namespace Entities.AI
 {
     public class QueenRangedEnemyAI : EnemyAIBase
     {
-        public int maxDiagonalRange = 2; // ❗ По-хорошему, вынести в Runtime Stats
+        public int maxDiagonalRange = 5; // ❗ По-хорошему, вынести в Runtime Stats
         
         public override Vector3Int? CalculateBestMove(EnemyBase enemy)
         {
@@ -95,8 +95,9 @@ namespace Entities.AI
                 if (!GridManager.Instance.IsCellShootable(current))
                     return false;
 
-                if (GridManager.Instance.GetEntityAt(current) != null)
-                    return false;
+                // Может стрелять
+                // if (GridManager.Instance.GetEntityAt(current) != null)
+                //     return false;
 
                 current += new Vector3Int(stepX, stepY, 0);
             }

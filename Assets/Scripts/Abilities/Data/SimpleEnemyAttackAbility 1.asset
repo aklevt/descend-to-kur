@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c84873b5b404b20bb501d0d5f49ba52, type: 3}
+  m_Name: SimpleEnemyAttackAbility 1
+  m_EditorClassIdentifier: GameScripts::Abilities.SimpleAttackAbilityData
+  abilityName: "\u0411\u043B\u0438\u0436\u043D\u044F\u044F \u0430\u0442\u0430\u043A\u0430"
+  displayMinRange: 0
+  displayRange: -1
+  description: 
+  energyCost: 3
+  bonusDamage: 0
+  overrideBaseDamage: 0
+  highlightColor: {r: 0.6862745, g: 0, b: 0, a: 1}
+  effectColor: {r: 1, g: 0.2, b: 0.2, a: 0.9}
+  forceProceduralPunch: 1
+  useDiagonalPunch: 1
+  limitOncePerTurn: 0
