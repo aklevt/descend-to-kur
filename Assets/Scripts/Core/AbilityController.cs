@@ -188,7 +188,13 @@ namespace Core
             if (!CanProcessCellClick()) return;
 
             if (!ValidatePlayerStateForAction()) return;
-
+            
+            if (GridManager.Instance != null && !GridManager.Instance.HasFloor(clickedCell))
+            {
+                UIController.Instance?.ShowWarning("Там ничего нет!", "Вы не можете взаимодействовать с клетками вне поля");
+                return;
+            }
+            
             var player1 = PlayerMovement.Instance;
             if (player1 == null) return;
             
@@ -267,6 +273,13 @@ namespace Core
                         "Вы можете толкать на шипы монстров, а они могут вас");
                     return;
                 }
+                
+                if (GridManager.Instance != null && GridManager.Instance.IsHealingItemAt(clickedCell))
+                {
+                    UIController.Instance?.ShowWarning("Табличка с заклинанием",
+                        "Завершите ход, стоя на ней, чтобы восстановить часть здоровья");
+                    return;
+                }
             }
 
             // Внутри теоретического радиуса
@@ -296,7 +309,8 @@ namespace Core
                         var stats = player.Stats;
                         var distance = Mathf.Abs(clickedCell.x - player.CurrentCell.x) +
                                        Mathf.Abs(clickedCell.y - player.CurrentCell.y);
-
+                        
+                        Debug.Log($"{stats.RemainingSteps} {stats.Energy}");
                         // Нехватка шагов
                         if (distance > stats.RemainingSteps)
                         {

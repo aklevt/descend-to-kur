@@ -10,36 +10,36 @@ namespace UI
     {
         public static TransitionScreenManager Instance { get; private set; }
 
-        [Header("Victory Screen")] [SerializeField]
-        private GameObject victoryPanel;
-
+        [Header("Victory Screen")] 
+        [SerializeField] private GameObject victoryPanel;
         [SerializeField] private TextMeshProUGUI victoryTitle;
         [SerializeField] private Button victoryNextButton;
-        
         [SerializeField] private CanvasGroup victoryContainerGroup;
         [SerializeField] private RectTransform victoryLineRect;
         [SerializeField] private float targetLineWidth = 400f; 
         [SerializeField] private float elementsFadeDuration = 0.5f;
         [SerializeField] private AnimationCurve lineBounceCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
 
-        [Header("Defeat Screen")] [SerializeField]
-        private GameObject defeatPanel;
-
+        [Header("Defeat Screen")] 
+        [SerializeField] private GameObject defeatPanel;
         [SerializeField] private TextMeshProUGUI defeatTitle;
         [SerializeField] private Button defeatRetryButton;
+        [SerializeField] private CanvasGroup defeatContainerGroup;
+        [SerializeField] private RectTransform defeatLineRect;
+        [SerializeField] private float defeatTargetLineWidth = 400f; 
+        [SerializeField] private float defeatElementsFadeDuration = 0.5f;
+        [SerializeField] private AnimationCurve defeatLineBounceCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
 
-        [Header("Black Overlay")] [SerializeField]
-        private CanvasGroup blackOverlayGroup;
+        [Header("Black Overlay")] 
+        [SerializeField] private CanvasGroup blackOverlayGroup;
 
-        [Header("Vignette Settings")] [SerializeField]
-        private Image vignetteImage;
-
+        [Header("Vignette Settings")] 
+        [SerializeField] private Image vignetteImage;
         [SerializeField] private Material vignetteMaterial;
         [SerializeField] private float colorTransitionDuration = 0.5f;
 
-        [Header("Vignette Colors")] [SerializeField]
-        private Color victoryVignetteColor = Color.white;
-
+        [Header("Vignette Colors")] 
+        [SerializeField] private Color victoryVignetteColor = Color.white;
         [SerializeField] private Color defeatVignetteColor = new Color(0.67f, 0f, 0f, 1f);
         
         private bool canSkip = false;
@@ -55,14 +55,12 @@ namespace UI
 
         private void Start()
         {
-            
             if (vignetteMaterial == null && vignetteImage != null)
             {
                 vignetteMaterial = vignetteImage.material;
             }
             
             ResetVignette();
-            
             HideAll();
         }
         
@@ -74,9 +72,6 @@ namespace UI
             }
         }
         
-        /// <summary>
-        /// Пропустить текущий экран (по ESC)
-        /// </summary>
         public void SkipScreen()
         {
             if (canSkip)
@@ -177,6 +172,15 @@ namespace UI
             
             Core.GameStateManager.Instance?.SetState(Core.GameState.GameOver);
 
+            if (defeatContainerGroup != null)
+            {
+                defeatContainerGroup.alpha = 0f;
+            }
+            if (defeatLineRect != null)
+            {
+                defeatLineRect.sizeDelta = new Vector2(0f, defeatLineRect.sizeDelta.y);
+            }
+
             defeatPanel.SetActive(true);
             if (defeatTitle != null)
             {
@@ -186,15 +190,51 @@ namespace UI
                 defeatTitle.color = color;
             }
 
+            var elementsAnimRoutine = StartCoroutine(AnimateDefeatElements());
+
             yield return StartCoroutine(ChangeVignetteColorWithTextFade(defeatVignetteColor, defeatTitle));
 
             yield return StartCoroutine(WaitForDefeatButton());
+
+            if (elementsAnimRoutine != null) StopCoroutine(elementsAnimRoutine);
 
             yield return StartCoroutine(ChangeVignetteColorWithTextFade(Color.black, defeatTitle, false));
 
             HideDefeatScreen();
             
             Core.GameStateManager.Instance?.SetState(Core.GameState.Transition);
+        }
+
+        private IEnumerator AnimateDefeatElements()
+        {
+            yield return new WaitForSeconds(0.3f);
+
+            var elapsed = 0f;
+            var initialSize = defeatLineRect != null ? defeatLineRect.sizeDelta : Vector2.zero;
+
+            while (elapsed < defeatElementsFadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                var t = elapsed / defeatElementsFadeDuration;
+
+                if (defeatContainerGroup != null)
+                {
+                    defeatContainerGroup.alpha = t;
+                }
+
+                if (defeatLineRect != null)
+                {
+                    var curveValue = defeatLineBounceCurve.Evaluate(t);
+                    var currentWidth = curveValue * defeatTargetLineWidth;
+                    
+                    defeatLineRect.sizeDelta = new Vector2(currentWidth, initialSize.y);
+                }
+
+                yield return null;
+            }
+
+            if (defeatContainerGroup != null) defeatContainerGroup.alpha = 1f;
+            if (defeatLineRect != null) defeatLineRect.sizeDelta = new Vector2(defeatTargetLineWidth, initialSize.y);
         }
 
         private IEnumerator ChangeVignetteColorWithTextFade(Color targetColor, TextMeshProUGUI textToFade,
@@ -289,7 +329,6 @@ namespace UI
             }
 
             blackOverlayGroup.alpha = 0f;
-
             blackOverlayGroup.gameObject.SetActive(false);
         }
 
@@ -313,12 +352,10 @@ namespace UI
             }
 
             blackOverlayGroup.alpha = 1f;
-
             duringFade?.Invoke();
 
             yield return new WaitForSeconds(0.2f);
         }
-
 
         public void HideVictoryScreen()
         {
