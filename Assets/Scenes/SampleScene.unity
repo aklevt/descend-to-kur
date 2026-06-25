@@ -11101,8 +11101,6 @@ MonoBehaviour:
   roomPrefabs:
   - {fileID: 1108904379850795440, guid: cea7596b574235f4fab760b025578343, type: 3}
   - {fileID: 1108904379850795440, guid: 9ad1387702c06fa449c5f314e7e81815, type: 3}
-  - {fileID: 1108904379850795440, guid: f86978306ea04f345a0495d126cdf4ce, type: 3}
-  - {fileID: 1108904379850795440, guid: 0f67b905cd5c8b24d86f7fd30082a3dd, type: 3}
   - {fileID: 1108904379850795440, guid: 06e1fd5ca1f322a45a5beb7073302ae0, type: 3}
   - {fileID: 1108904379850795440, guid: 66e14a2f85f7e2d40879f8f6d0b0909d, type: 3}
   defaultGameplayMusic: {fileID: 8300000, guid: d362158678d74174393fabfabe9b3ae1, type: 3}
