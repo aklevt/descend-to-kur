@@ -2743,7 +2743,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 194.94347, y: -412.8877}
+  m_AnchoredPosition: {x: 194.94348, y: -412.8877}
   m_SizeDelta: {x: 349.88693, y: 785.7754}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &279546321
@@ -11099,7 +11099,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelController
   roomPrefabs:
-  - {fileID: 1108904379850795440, guid: cea7596b574235f4fab760b025578343, type: 3}
   - {fileID: 1108904379850795440, guid: 9ad1387702c06fa449c5f314e7e81815, type: 3}
   - {fileID: 1108904379850795440, guid: 06e1fd5ca1f322a45a5beb7073302ae0, type: 3}
   - {fileID: 1108904379850795440, guid: 66e14a2f85f7e2d40879f8f6d0b0909d, type: 3}
